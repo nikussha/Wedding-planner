@@ -1,0 +1,31 @@
+<section class="blog-list">
+  <div class="container">
+    <h1>From Our Blog</h1>
+
+    @if (posts().length) {
+      <div class="blog-list__grid">
+        @for (post of posts(); track post.id) {
+          <article class="blog-card">
+            @if (post.coverImage) {
+              <a [routerLink]="['/blog', post.slug]">
+                <img [src]="post.coverImage" [alt]="post.title" loading="lazy" />
+              </a>
+            }
+            <div class="blog-card__body">
+              <h2><a [routerLink]="['/blog', post.slug]">{{ post.title }}</a></h2>
+              @if (post.publishedAt) {
+                <p class="blog-card__date">{{ post.publishedAt | date: 'longDate' }}</p>
+              }
+              @if (post.excerpt) {
+                <p class="blog-card__excerpt">{{ post.excerpt }}</p>
+              }
+              <a class="blog-card__link" [routerLink]="['/blog', post.slug]">Read more &rarr;</a>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <p class="blog-list__empty">No blog posts yet — check back soon!</p>
+    }
+  </div>
+</section>

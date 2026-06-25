@@ -1,0 +1,21 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__brand" routerLink="/">Wedding Planner</a>
+
+    <nav class="site-header__nav" aria-label="Main navigation">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/blog" routerLinkActive="is-active">Blog</a>
+    </nav>
+
+    <div class="site-header__actions">
+      @if (isAuthenticated()) {
+        <a class="btn" routerLink="/booking">Book Now</a>
+        <span class="site-header__user">{{ user()?.name }}</span>
+        <button type="button" class="btn btn-ghost" (click)="logout()">Logout</button>
+      } @else {
+        <a class="btn btn-ghost" routerLink="/login">Login</a>
+        <a class="btn" routerLink="/register">Register</a>
+      }
+    </div>
+  </div>
+</header>

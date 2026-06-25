@@ -42,6 +42,13 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# database
+/prisma/*.db
+/prisma/*.db-journal
+
+# uploaded media
+/uploads
+
 # temp directory
 .temp
 .tmp

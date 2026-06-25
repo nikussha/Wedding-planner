@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum support in Prisma, so Role/BookingStatus are
+// plain strings here. The allowed values are enforced in TS via the
+// Role/BookingStatus const objects in src/common/enums and validated in DTOs.
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  role          String         @default("USER")
+  refreshTokens RefreshToken[]
+  appointments  Appointment[]
+  blogPosts     BlogPost[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  title     String?
+  body      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String?
+  content     String
+  coverImage  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventDate DateTime
+  message   String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}

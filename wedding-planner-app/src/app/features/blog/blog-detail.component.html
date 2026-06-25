@@ -1,0 +1,19 @@
+@if (post()) {
+  <article class="post container">
+    <h1>{{ post()?.title }}</h1>
+    @if (post()?.publishedAt) {
+      <p class="post__date">{{ post()?.publishedAt | date: 'longDate' }}</p>
+    }
+    @if (post()?.coverImage) {
+      <img class="post__cover" [src]="post()?.coverImage" [alt]="post()?.title" />
+    }
+    <div class="post__content">{{ post()?.content }}</div>
+    <a class="btn btn-outline" routerLink="/blog">&larr; Back to Blog</a>
+  </article>
+} @else if (notFound()) {
+  <div class="container not-found">
+    <h1>Post Not Found</h1>
+    <p>We couldn't find the blog post you're looking for.</p>
+    <a class="btn" routerLink="/blog">Back to Blog</a>
+  </div>
+}

@@ -1,0 +1,42 @@
+<div class="page-header">
+  <h1>Blog Posts</h1>
+  <a routerLink="/blog/new" class="btn">New Post</a>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (posts().length === 0) {
+  <p>No blog posts yet. Create your first one.</p>
+} @else {
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Published</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (post of posts(); track post.id) {
+          <tr>
+            <td>{{ post.title }}</td>
+            <td>
+              @if (post.published) {
+                <span class="badge badge-published">Published</span>
+              } @else {
+                <span class="badge badge-draft">Draft</span>
+              }
+            </td>
+            <td>{{ post.publishedAt ? (post.publishedAt | date: 'mediumDate') : '—' }}</td>
+            <td class="actions">
+              <a [routerLink]="['/blog', post.id, 'edit']" class="btn btn-outline btn-sm">Edit</a>
+              <button type="button" class="btn btn-danger btn-sm" (click)="remove(post)">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

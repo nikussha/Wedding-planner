@@ -1,0 +1,36 @@
+<section class="hero">
+  <div class="container hero__inner">
+    @if (hero()) {
+      <h1>{{ hero()?.title }}</h1>
+      <p class="hero__body">{{ hero()?.body }}</p>
+    }
+    <a class="btn" routerLink="/booking">Book Your Date</a>
+  </div>
+</section>
+
+@if (about()) {
+  <section class="about">
+    <div class="container">
+      <h2>{{ about()?.title }}</h2>
+      <p>{{ about()?.body }}</p>
+    </div>
+  </section>
+}
+
+@if (photos().length) {
+  <section class="gallery">
+    <div class="container">
+      <h2>Gallery</h2>
+      <div class="gallery__grid">
+        @for (photo of photos(); track photo.id) {
+          <figure class="gallery__item">
+            <img [src]="photo.url" [alt]="photo.alt ?? ''" loading="lazy" />
+            @if (photo.caption) {
+              <figcaption>{{ photo.caption }}</figcaption>
+            }
+          </figure>
+        }
+      </div>
+    </div>
+  </section>
+}

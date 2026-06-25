@@ -1,0 +1,57 @@
+<div class="page-header">
+  <h1>Bookings</h1>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (bookings().length === 0) {
+  <p>No booking requests yet.</p>
+} @else {
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Requester</th>
+          <th>Event Date</th>
+          <th>Message</th>
+          <th>Status</th>
+          <th>Requested</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (booking of bookings(); track booking.id) {
+          <tr>
+            <td>
+              @if (booking.user) {
+                <div class="requester">
+                  <span class="requester-name">{{ booking.user.name }}</span>
+                  <span class="requester-email">{{ booking.user.email }}</span>
+                </div>
+              } @else {
+                —
+              }
+            </td>
+            <td>{{ booking.eventDate | date: 'mediumDate' }}</td>
+            <td class="message-cell">{{ booking.message || '—' }}</td>
+            <td>
+              <span class="badge" [class]="badgeClass(booking.status)">{{ booking.status }}</span>
+            </td>
+            <td>{{ booking.createdAt | date: 'short' }}</td>
+            <td>
+              <select
+                [value]="booking.status"
+                (change)="updateStatus(booking, $any($event.target).value)"
+                [disabled]="updatingId() === booking.id"
+              >
+                @for (option of statusOptions; track option) {
+                  <option [value]="option">{{ option }}</option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

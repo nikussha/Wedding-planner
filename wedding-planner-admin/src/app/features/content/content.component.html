@@ -1,0 +1,33 @@
+<div class="page-header">
+  <h1>Site Content</h1>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else {
+  <div class="sections">
+    @for (section of sections; track section.key) {
+      <div class="card section-card">
+        <h2>{{ section.label }}</h2>
+        <p class="section-description">{{ section.description }}</p>
+
+        <form [formGroup]="forms.get(section.key)!" (ngSubmit)="save(section.key)">
+          <label [for]="section.key + '-title'">Title</label>
+          <input [id]="section.key + '-title'" type="text" formControlName="title" />
+
+          <label [for]="section.key + '-body'">Body</label>
+          <textarea [id]="section.key + '-body'" rows="5" formControlName="body"></textarea>
+
+          <div class="section-actions">
+            <button type="submit" class="btn" [disabled]="savingKey() === section.key">
+              {{ savingKey() === section.key ? 'Saving…' : 'Save' }}
+            </button>
+            @if (savedKey() === section.key) {
+              <span class="saved-message">Saved.</span>
+            }
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+}

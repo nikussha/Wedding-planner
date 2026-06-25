@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h1>{{ isEditMode() ? 'Edit Post' : 'New Post' }}</h1>
+  <a routerLink="/blog" class="btn btn-outline">Back to Posts</a>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="submit()" class="card post-form">
+    <label for="title">Title</label>
+    <input id="title" type="text" formControlName="title" />
+    @if (form.controls.title.invalid && form.controls.title.touched) {
+      <p class="form-error">Title must be between 2 and 200 characters.</p>
+    }
+
+    <label for="slug">Slug</label>
+    <input id="slug" type="text" formControlName="slug" />
+    @if (form.controls.slug.invalid && form.controls.slug.touched) {
+      <p class="form-error">Slug must use lowercase letters, numbers and hyphens only.</p>
+    }
+
+    <label for="excerpt">Excerpt</label>
+    <textarea id="excerpt" rows="2" formControlName="excerpt"></textarea>
+    @if (form.controls.excerpt.invalid && form.controls.excerpt.touched) {
+      <p class="form-error">Excerpt must be 500 characters or fewer.</p>
+    }
+
+    <label for="coverImage">Cover image URL</label>
+    <input id="coverImage" type="text" formControlName="coverImage" placeholder="/uploads/example.jpg" />
+
+    <label for="content">Content</label>
+    <textarea id="content" rows="12" formControlName="content"></textarea>
+    @if (form.controls.content.invalid && form.controls.content.touched) {
+      <p class="form-error">Content is required.</p>
+    }
+
+    <label class="checkbox-label">
+      <input type="checkbox" formControlName="published" />
+      Published
+    </label>
+
+    @if (errorMessage()) {
+      <p class="form-error">{{ errorMessage() }}</p>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : 'Save Post' }}
+      </button>
+    </div>
+  </form>
+}

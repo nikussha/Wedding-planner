@@ -1,0 +1,33 @@
+<section class="booking container">
+  <h1>Book Your Date</h1>
+  <p class="booking__subtitle">Tell us a bit about your event and we'll get back to you shortly.</p>
+
+  @if (success()) {
+    <div class="booking__success">
+      <h2>Thank you!</h2>
+      <p>Your booking request has been received. We'll be in touch soon to confirm the details.</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label for="eventDate">Event Date</label>
+      <input id="eventDate" type="date" formControlName="eventDate" />
+      @if (form.controls.eventDate.invalid && form.controls.eventDate.touched) {
+        <p class="booking__error">Please choose a date for your event.</p>
+      }
+
+      <label for="message">Message (optional)</label>
+      <textarea id="message" rows="5" formControlName="message" maxlength="2000"></textarea>
+      @if (form.controls.message.invalid && form.controls.message.touched) {
+        <p class="booking__error">Message must be 2000 characters or fewer.</p>
+      }
+
+      @if (errorMessage()) {
+        <p class="booking__error booking__error--general">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" class="btn" [disabled]="submitting()">
+        {{ submitting() ? 'Submitting…' : 'Request Booking' }}
+      </button>
+    </form>
+  }
+</section>

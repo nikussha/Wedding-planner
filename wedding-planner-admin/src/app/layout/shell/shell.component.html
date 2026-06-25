@@ -1,0 +1,28 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">WP</span>
+      <span class="brand-name">Wedding Planner Admin</span>
+    </div>
+
+    <nav class="nav">
+      @for (link of navLinks; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active" class="nav-link">{{ link.label }}</a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (user()) {
+        <div class="user-info">
+          <span class="user-name">{{ user()!.name }}</span>
+          <span class="user-email">{{ user()!.email }}</span>
+        </div>
+      }
+      <button type="button" class="btn btn-outline btn-sm logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

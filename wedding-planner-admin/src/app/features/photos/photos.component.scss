@@ -1,0 +1,54 @@
+.upload-card {
+  margin-bottom: 1.5rem;
+  max-width: 640px;
+
+  h2 {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+  }
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.photo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.25rem;
+  }
+
+  label {
+    margin-bottom: -0.2rem;
+  }
+}
+
+.photo-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+
+  .btn-danger {
+    margin-left: auto;
+  }
+}
