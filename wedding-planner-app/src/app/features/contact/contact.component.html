@@ -1,0 +1,143 @@
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow">Contact</span>
+    <h1>{{ introHeading() }}</h1>
+    @if (introBlurb()) {
+      <p class="lede">{{ introBlurb() }}</p>
+    }
+  </div>
+</header>
+
+<section class="section">
+  <div class="container contact">
+    <!-- Primary path: the calendar. It converts better among people who are
+         ready to talk, so it comes first. -->
+    <aside class="consult">
+      <span class="eyebrow eyebrow--muted">The quickest way</span>
+      <h2 class="consult__title">{{ consultHeading() }}</h2>
+      <p class="consult__body">
+        @if (consultBlurb()) {
+          {{ consultBlurb() }}
+        } @else {
+          A {{ consultationLength() || '' }} conversation about the day you are imagining. It is
+          free, there is no obligation, and you will leave knowing what working together would look
+          like.
+        }
+      </p>
+
+      <dl class="facts">
+        @if (consultationLength()) {
+          <dt>Length</dt>
+          <dd>{{ consultationLength() }} conversation</dd>
+        }
+        <dt>Cost</dt>
+        <dd>Free, with no obligation</dd>
+        <dt>How</dt>
+        <dd>Pick a day and time from the calendar</dd>
+      </dl>
+
+      <a class="btn btn-lg consult__cta" routerLink="/booking">See available times</a>
+
+      @if (hasContactDetails()) {
+        <div class="consult__direct">
+          <h3 class="consult__direct-title">Or reach us directly</h3>
+          <ul class="consult__list">
+            @if (email()) {
+              <li><a [href]="'mailto:' + email()">{{ email() }}</a></li>
+            }
+            @if (phone()) {
+              <li><a [href]="telHref(phone()!)">{{ phone() }}</a></li>
+            }
+            @if (instagram()) {
+              <li><a [href]="instagram()" target="_blank" rel="noopener noreferrer me">Instagram</a></li>
+            }
+            @if (pinterest()) {
+              <li><a [href]="pinterest()" target="_blank" rel="noopener noreferrer me">Pinterest</a></li>
+            }
+          </ul>
+        </div>
+      }
+    </aside>
+
+    <!-- Secondary path: a short note, for couples who are not ready to book
+         a call but want to start a conversation. -->
+    <div class="enquiry">
+      @if (sent()) {
+        <div class="enquiry__done">
+          <span class="eyebrow">Received</span>
+          <h2>Thank you — your note is with us</h2>
+          <p>
+            We read everything that comes in and will reply by email. If your date is close, book a
+            consultation as well so we can talk sooner.
+          </p>
+          <div class="enquiry__done-actions">
+            <a class="btn" routerLink="/booking">See available times</a>
+            <button type="button" class="btn btn-outline" (click)="writeAnother()">
+              Send another note
+            </button>
+          </div>
+        </div>
+      } @else {
+        <h2 class="enquiry__title">Send a note</h2>
+        <p class="enquiry__intro">
+          Five quick things, and as much or as little detail as you like.
+        </p>
+
+        <form class="form-column" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="field">
+            <label class="field__label" for="names">Your names</label>
+            <input id="names" type="text" formControlName="names" autocomplete="name" />
+            @if (form.controls.names.touched && form.controls.names.invalid) {
+              <p class="field__error">Please tell us what to call you.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="email">Email</label>
+            <input id="email" type="email" formControlName="email" autocomplete="email" />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <p class="field__error">We need a valid email address to reply to.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="weddingDate">Wedding date</label>
+            <input id="weddingDate" type="date" formControlName="weddingDate" />
+            <span class="field__hint">Leave this empty if you have not set one yet.</span>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="location">Venue or location</label>
+            <input
+              id="location"
+              type="text"
+              formControlName="location"
+              placeholder="Or “still looking”"
+            />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="message">About your day</label>
+            <textarea
+              id="message"
+              formControlName="message"
+              maxlength="4000"
+              placeholder="Guest numbers, the feeling you are after, what you have booked already…"
+            ></textarea>
+            @if (form.controls.message.touched && form.controls.message.invalid) {
+              <p class="field__error">A sentence or two is plenty — just not empty.</p>
+            }
+          </div>
+
+          @if (errorMessage()) {
+            <p class="field__error" role="alert">{{ errorMessage() }}</p>
+          }
+
+          <button type="submit" class="btn" [disabled]="submitting()">
+            {{ submitting() ? 'Sending…' : 'Send your note' }}
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+</section>

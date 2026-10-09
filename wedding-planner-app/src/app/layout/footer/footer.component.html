@@ -1,0 +1,45 @@
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <p class="footer__name">{{ siteName() }}</p>
+      @if (region()) {
+        <p class="footer__region">Wedding planning in {{ region() }}</p>
+      }
+      <a class="btn btn-sm footer__cta" routerLink="/booking">Book a consultation</a>
+    </div>
+
+    <nav class="footer__col" aria-label="Footer navigation">
+      <h2 class="footer__heading">Explore</h2>
+      <a routerLink="/services">Services</a>
+      <a routerLink="/about">About</a>
+      <a routerLink="/blog">Journal</a>
+      <a routerLink="/contact">Contact</a>
+      <a routerLink="/booking">Availability</a>
+    </nav>
+
+    @if (hasContactDetails()) {
+      <div class="footer__col">
+        <h2 class="footer__heading">Get in touch</h2>
+        @if (email()) {
+          <a [href]="'mailto:' + email()">{{ email() }}</a>
+        }
+        @if (phone()) {
+          <a [href]="telHref(phone()!)">{{ phone() }}</a>
+        }
+        @if (instagram()) {
+          <a [href]="instagram()" target="_blank" rel="noopener noreferrer me">Instagram</a>
+        }
+        @if (pinterest()) {
+          <a [href]="pinterest()" target="_blank" rel="noopener noreferrer me">Pinterest</a>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="container footer__legal">
+    <p>&copy; {{ year }} {{ siteName() }}. All rights reserved.</p>
+    <p class="footer__credit">Photography shared with our couples&rsquo; permission.</p>
+    <!-- Anyone who has read this far is a long way from the top. -->
+    <a class="footer__top" href="#main">Back to top &uarr;</a>
+  </div>
+</footer>

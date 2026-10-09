@@ -1,0 +1,36 @@
+<div class="page-header">
+  <h1>Dashboard</h1>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else {
+  <div class="stats-grid">
+    <a routerLink="/bookings" class="stat-card card">
+      <span class="stat-value">{{ bookingCount() }}</span>
+      <span class="stat-label">Total Bookings</span>
+      <span class="stat-sub">{{ pendingBookingCount() }} pending</span>
+    </a>
+
+    <a routerLink="/blog" class="stat-card card">
+      <span class="stat-value">{{ postCount() }}</span>
+      <span class="stat-label">Blog Posts</span>
+      <span class="stat-sub">{{ publishedPostCount() }} published</span>
+    </a>
+
+    <a routerLink="/users" class="stat-card card">
+      <span class="stat-value">{{ userCount() }}</span>
+      <span class="stat-label">Registered Users</span>
+    </a>
+  </div>
+
+  <div class="quick-links card">
+    <h2>Quick Links</h2>
+    <ul>
+      <li><a routerLink="/content">Edit landing page content</a></li>
+      <li><a routerLink="/photos">Manage gallery photos</a></li>
+      <li><a routerLink="/blog">Write a new blog post</a></li>
+      <li><a routerLink="/bookings">Review pending bookings</a></li>
+    </ul>
+  </div>
+}

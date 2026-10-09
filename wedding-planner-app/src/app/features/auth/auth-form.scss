@@ -1,0 +1,82 @@
+/* Shared by the sign-in and register pages. */
+
+.auth-form {
+  max-width: 30rem;
+  margin-inline: auto;
+  padding-block: var(--section);
+
+  h1 {
+    text-align: center;
+    margin-bottom: var(--space-2xs);
+  }
+}
+
+.auth-form__subtitle {
+  margin-bottom: var(--space-lg);
+  color: var(--ink-700);
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+label {
+  display: block;
+  margin-bottom: var(--space-2xs);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  color: var(--ink-700);
+}
+
+input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--surface);
+  /* At or above 16px, or iOS Safari zooms the page when the field is focused. */
+  font-size: var(--fs-body);
+  font-family: inherit;
+  color: var(--ink-900);
+
+  &:hover {
+    border-color: var(--ink-500);
+  }
+
+  &:focus-visible {
+    border-color: var(--ink-700);
+    outline: 2px solid var(--ink-900);
+    outline-offset: 2px;
+  }
+}
+
+.auth-form__error {
+  display: block;
+  margin: 0;
+  color: #96271f;
+  font-size: var(--fs-caption);
+}
+
+.auth-form__error--general {
+  padding: var(--space-2xs) var(--space-xs);
+  border-left: 2px solid #96271f;
+  background: var(--sand-50);
+}
+
+button[type='submit'] {
+  width: 100%;
+}
+
+.auth-form__alt {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+  font-size: var(--fs-small);
+  color: var(--ink-700);
+}

@@ -1,0 +1,141 @@
+<div class="page-header">
+  <h1>Opening hours</h1>
+</div>
+
+@if (loading()) {
+  <p>Loading&hellip;</p>
+} @else {
+  <div class="card settings">
+    <p class="settings__intro">
+      These settings build the calendar visitors see. Changing them takes effect immediately;
+      appointments already confirmed are never moved.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <fieldset class="field-group">
+        <legend>Open days</legend>
+        <div class="weekdays">
+          @for (weekday of weekdays; track weekday.value) {
+            <label class="weekday" [class.weekday--on]="isOpen(weekday.value)">
+              <input
+                type="checkbox"
+                class="weekday__input"
+                [checked]="isOpen(weekday.value)"
+                (change)="toggleWeekday(weekday.value)"
+              />
+              {{ weekday.label }}
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>Working day</legend>
+        <div class="fields">
+          <label class="field">
+            <span class="field__label">Day starts (hour)</span>
+            <input type="number" min="0" max="23" formControlName="dayStartHour" />
+          </label>
+          <label class="field">
+            <span class="field__label">Day ends (hour)</span>
+            <input type="number" min="1" max="24" formControlName="dayEndHour" />
+          </label>
+          <label class="field">
+            <span class="field__label">Appointment length (minutes)</span>
+            <input type="number" min="15" max="480" step="15" formControlName="slotMinutes" />
+          </label>
+        </div>
+
+        <p class="preview">
+          <span class="preview__label">{{ previewSummary() }}</span>
+          @if (slotPreview().length) {
+            <span class="preview__times">
+              @for (time of slotPreview(); track time) {
+                <span class="preview__time">{{ time }}</span>
+              }
+            </span>
+          }
+        </p>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>Booking window</legend>
+        <div class="fields">
+          <label class="field">
+            <span class="field__label">Minimum notice (hours)</span>
+            <input type="number" min="0" max="2160" formControlName="leadTimeHours" />
+            <span class="field__hint">Times sooner than this cannot be requested.</span>
+          </label>
+          <label class="field">
+            <span class="field__label">Book up to (days ahead)</span>
+            <input type="number" min="1" max="1095" formControlName="horizonDays" />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>Timezone</legend>
+        <div class="fields">
+          <label class="field">
+            <span class="field__label">Offset from UTC (minutes)</span>
+            <input type="number" min="-720" max="840" step="15" formControlName="timezoneOffsetMinutes" />
+            <span class="field__hint">240 = GMT+4. Every time on the site is shown in this zone.</span>
+          </label>
+          <label class="field">
+            <span class="field__label">Label shown to visitors</span>
+            <input type="text" maxlength="32" formControlName="timezoneLabel" />
+          </label>
+        </div>
+      </fieldset>
+
+      <button type="submit" class="btn" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : 'Save opening hours' }}
+      </button>
+    </form>
+  </div>
+
+  <section class="section">
+    <h2 class="section__title">Closed dates</h2>
+    <p class="section__intro">
+      Holidays, weddings you are already working, time off. A closed date disappears from the
+      visitor's calendar.
+    </p>
+
+    <div class="card">
+      <form class="blockform" [formGroup]="blockForm" (ngSubmit)="addBlockedDate()">
+        <label class="field">
+          <span class="field__label">Date</span>
+          <input type="date" formControlName="date" />
+        </label>
+        <label class="field field--grow">
+          <span class="field__label">Reason (optional)</span>
+          <input type="text" maxlength="200" formControlName="reason" placeholder="Public holiday" />
+        </label>
+        <button type="submit" class="btn btn-sm" [disabled]="addingBlockedDate()">
+          {{ addingBlockedDate() ? 'Closing…' : 'Close this date' }}
+        </button>
+      </form>
+
+      @if (blockedDates().length === 0) {
+        <p class="section__empty">No closed dates. Every open weekday is bookable.</p>
+      } @else {
+        <ul class="blocked">
+          @for (blocked of blockedDates(); track blocked.id) {
+            <li class="blocked__item">
+              <span class="blocked__date">{{ dateLabel(blocked) }}</span>
+              <span class="blocked__reason">{{ blocked.reason || '—' }}</span>
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                [disabled]="removingId() === blocked.id"
+                (click)="removeBlockedDate(blocked)"
+              >
+                Reopen
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </section>
+}

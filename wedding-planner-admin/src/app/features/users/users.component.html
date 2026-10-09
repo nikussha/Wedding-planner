@@ -1,0 +1,49 @@
+<div class="page-header">
+  <h1>Users</h1>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else {
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge" [class]="user.role === 'ADMIN' ? 'badge-admin' : 'badge-user'">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>{{ user.createdAt | date: 'mediumDate' }}</td>
+            <td>
+              @if (user.id === currentUserId()) {
+                <span class="self-note">You</span>
+              } @else {
+                <button
+                  type="button"
+                  class="btn btn-outline btn-sm"
+                  (click)="toggleRole(user)"
+                  [disabled]="updatingId() === user.id"
+                >
+                  {{ user.role === 'ADMIN' ? 'Revoke Admin' : 'Make Admin' }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

@@ -1,0 +1,36 @@
+<section class="auth-form container">
+  <h1>Create Your Account</h1>
+  <p class="auth-form__subtitle">Register to request a booking with us.</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label for="name">Name</label>
+    <input id="name" type="text" formControlName="name" autocomplete="name" />
+    @if (form.controls.name.invalid && form.controls.name.touched) {
+      <p class="auth-form__error">Name must be between 2 and 80 characters.</p>
+    }
+
+    <label for="email">Email</label>
+    <input id="email" type="email" formControlName="email" autocomplete="email" />
+    @if (form.controls.email.invalid && form.controls.email.touched) {
+      <p class="auth-form__error">Please enter a valid email address.</p>
+    }
+
+    <label for="password">Password</label>
+    <input id="password" type="password" formControlName="password" autocomplete="new-password" />
+    @if (form.controls.password.invalid && form.controls.password.touched) {
+      <p class="auth-form__error">Password must be at least 8 characters.</p>
+    }
+
+    @if (errorMessage()) {
+      <p class="auth-form__error auth-form__error--general">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" class="btn" [disabled]="submitting()">
+      {{ submitting() ? 'Creating account…' : 'Register' }}
+    </button>
+  </form>
+
+  <p class="auth-form__alt">
+    Already have an account? <a routerLink="/login">Log in here</a>.
+  </p>
+</section>

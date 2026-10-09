@@ -1,0 +1,52 @@
+<header class="masthead" [class.is-scrolled]="scrolled()" [class.is-open]="menuOpen()">
+  <div class="container masthead__inner">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <span class="brand__name">{{ siteName() }}</span>
+      @if (region()) {
+        <span class="brand__region">{{ region() }}</span>
+      }
+    </a>
+
+    <button
+      type="button"
+      class="masthead__toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="site-menu"
+      aria-label="Menu"
+    >
+      <span class="masthead__bar"></span>
+      <span class="masthead__bar"></span>
+    </button>
+
+    <div class="masthead__menu" id="site-menu">
+      <nav class="nav" aria-label="Main navigation">
+        @for (link of navLinks; track link.path) {
+          <a
+            class="nav__link"
+            [routerLink]="link.path"
+            routerLinkActive="is-active"
+            (click)="closeMenu()"
+          >
+            {{ link.label }}
+          </a>
+        }
+      </nav>
+
+      <div class="masthead__actions">
+        <!-- Full size, not btn-sm: this is the one thing the whole site asks
+             visitors to do. -->
+        <a class="btn" routerLink="/booking" (click)="closeMenu()">Book a consultation</a>
+
+        @if (isAuthenticated()) {
+          <span class="masthead__account">
+            <span class="masthead__who">{{ firstName() }}</span>
+            <button type="button" class="masthead__quiet" (click)="logout()">Sign out</button>
+          </span>
+        } @else {
+          <a class="masthead__quiet" routerLink="/login" (click)="closeMenu()">Sign in</a>
+        }
+      </div>
+    </div>
+  </div>
+</header>

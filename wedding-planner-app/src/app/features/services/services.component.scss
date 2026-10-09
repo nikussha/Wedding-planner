@@ -1,0 +1,168 @@
+/* ---------------------------------------------------------------------- *
+ * Contents index: name on the left, detail on the right, hairline between.
+ * Straight from print, and almost nobody does it on the web.
+ * ---------------------------------------------------------------------- */
+
+.index__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.index__row {
+  border-bottom: 1px solid var(--line);
+}
+
+.index__link {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  text-decoration: none;
+  color: var(--ink-900);
+
+  &:hover {
+    color: var(--rose-700);
+    text-decoration: none;
+
+    .index__name {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+  }
+}
+
+.index__number {
+  font-family: var(--font-display);
+  font-size: var(--fs-small);
+  color: var(--gold-700);
+}
+
+.index__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+}
+
+.index__starts {
+  font-size: var(--fs-caption);
+  color: var(--ink-600);
+  text-align: right;
+}
+
+/* ---------------------------------------------------------------------- *
+ * One tier, long form: the argument on the left, the contents on the right
+ * ---------------------------------------------------------------------- */
+
+.tier-block__inner {
+  display: grid;
+  grid-template-columns: 5fr 1fr 6fr;
+  align-items: start;
+}
+
+.tier-block__intro {
+  grid-column: 1;
+  position: sticky;
+  /* Clears the sticky header when the detail column is long. */
+  top: calc(var(--header-h) + var(--space-md));
+}
+
+.tier-block__detail {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.included__title {
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-body);
+  font-size: var(--fs-overline);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.included__list,
+.excluded__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+    padding: var(--space-2xs) 0 var(--space-2xs) var(--space-md);
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  li:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* A hairline tick rather than a bullet glyph. */
+.included__list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 1.15em;
+  width: 9px;
+  height: 5px;
+  border-left: 1px solid var(--gold-700);
+  border-bottom: 1px solid var(--gold-700);
+  transform: rotate(-45deg);
+}
+
+.excluded {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line-strong);
+}
+
+.excluded__list li {
+  color: var(--ink-600);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 1.3em;
+    width: 9px;
+    height: 1px;
+    background: var(--ink-500);
+  }
+}
+
+@media (max-width: 920px) {
+  .tier-block__inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+
+  .tier-block__intro,
+  .tier-block__detail {
+    grid-column: 1;
+  }
+
+  .tier-block__intro {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .index__link {
+    grid-template-columns: 1.75rem 1fr;
+    gap: var(--space-sm);
+  }
+
+  .index__starts {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .tier-block__intro .btn {
+    width: 100%;
+  }
+}

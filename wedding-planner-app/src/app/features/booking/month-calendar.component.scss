@@ -1,0 +1,244 @@
+.cal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+}
+
+.cal__head {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cal__month {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: var(--fs-h3);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.cal__nav {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-tint);
+    border-color: var(--color-border-strong);
+  }
+
+  &:disabled {
+    color: var(--color-text-ghost);
+    cursor: not-allowed;
+  }
+}
+
+.cal__grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 6px;
+  table-layout: fixed;
+
+  th {
+    padding-bottom: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+}
+
+.cal__cell {
+  position: relative;
+  aspect-ratio: 1;
+  min-width: 52px;
+  padding: 0;
+  border-radius: 0;
+  text-align: center;
+  vertical-align: middle;
+  // Keeps the numerals from jittering between months.
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-ghost);
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+}
+
+.cal__num {
+  display: block;
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+.cal__cell--open {
+  color: var(--color-text);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-primary-tint);
+  }
+}
+
+.cal__cell--closed {
+  color: var(--color-text-ghost);
+}
+
+// Fully booked days keep their shape so a busy day is visibly different from a
+// free one, and carry both a lighter tone and a hairline stripe - never colour
+// alone - plus the word "Full".
+.cal__cell--full {
+  color: var(--color-text-faint);
+  background-image: linear-gradient(
+    45deg,
+    transparent calc(50% - 0.5px),
+    var(--color-border-strong) calc(50% - 0.5px),
+    var(--color-border-strong) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+// Open, but nothing left to request - times have passed or are inside the
+// notice period. Muted, but without the "booked" stripe, which would claim
+// someone else holds the day.
+.cal__cell--spent {
+  color: var(--color-text-faint);
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.cal__cell--today {
+  box-shadow: inset 0 0 0 1.5px var(--color-primary);
+}
+
+.cal__cell--selected,
+.cal__cell--selected.cal__cell--full {
+  background-color: var(--color-primary-dark);
+  background-image: none;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+
+  &:hover {
+    background-color: var(--color-primary-dark);
+  }
+
+  .cal__mark {
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .cal__mark--free {
+    background: #fff;
+    border-color: #fff;
+  }
+
+  .cal__tag {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.cal__marks {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 5px;
+  height: 6px;
+}
+
+.cal__mark {
+  width: 6px;
+  height: 6px;
+  border-radius: 0;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+}
+
+.cal__mark--free {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.cal__tag {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+.cal__key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.9rem 0 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.cal__key-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cal__key-item--full {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 600px) {
+  .cal {
+    padding: var(--space-md) var(--space-xs) var(--space-sm);
+  }
+
+  .cal__grid {
+    border-spacing: 3px;
+  }
+
+  /* Seven columns of 52px would overflow a 375px screen. */
+  .cal__cell {
+    min-width: 0;
+  }
+
+  .cal__num {
+    font-size: 1rem;
+  }
+
+  .cal__month {
+    font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal__cell,
+  .cal__nav {
+    transition: none;
+  }
+}

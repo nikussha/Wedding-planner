@@ -1,1 +1,865 @@
-/* You can add global styles to this file, and also import other style files */
+/**
+ * Global design system for the public site.
+ *
+ * Colour, type, spacing, rhythm and motion all live here as tokens, so the
+ * whole site can be retuned from one file. Two rules worth knowing before
+ * editing:
+ *
+ *  - Corners are square. The system is editorial: hairlines and surface
+ *    changes carry hierarchy, not radii and shadows. Mixing pills and square
+ *    corners is what makes a site look assembled rather than designed.
+ *  - Motion is opt-in, not opt-out: nothing moves unless it sits inside
+ *    `@media (prefers-reduced-motion: no-preference)`. A blanket
+ *    `transition-duration: 0.01ms !important` reset would give every element a
+ *    transition on *all* properties, which silently breaks JavaScript that
+ *    measures layout - and the booking calendar does exactly that.
+ */
+
+:root {
+  /* ---- brand ---------------------------------------------------------- */
+  /* Rose, with contrast-checked steps. rose-700 is the only one safe for
+     body-sized text on light grounds (7.8:1); rose-600 is for large text,
+     fills and accents (5.6:1). */
+  --rose-700: #783f48;
+  --rose-600: #94525d;
+  --rose-500: #b76e79;
+  --rose-100: #f1cdd1;
+  /* Gold is decoration on light grounds (2:1 as text) and text on dark ones. */
+  --gold-700: #756125;
+  --gold-500: #b89a4e;
+  --gold-300: #dcc687;
+
+  /* ---- surfaces ------------------------------------------------------- */
+  /* A warm paper ramp, 1.5-2.4% lightness apart: enough to read as a change
+     of plane, not enough to read as a stripe. */
+  --surface: #ffffff;
+  --canvas: #fffbf9;
+  --sand-50: #fdf5f2;
+  --sand-100: #f9efeb;
+  --sand-200: #f3e6e1;
+  --ink-surface: #2b2623;
+
+  /* ---- text ----------------------------------------------------------- */
+  --ink-900: #25211e;
+  --ink-800: #393432;
+  --ink-700: #514c49;
+  --ink-600: #6e6764;
+  /* Carries meaning (e.g. "Reserved"), so it stays above 3:1. */
+  --ink-500: #88817e;
+  /* Information-free only, e.g. dates in the past. */
+  --ink-300: #c4b9b1;
+  --on-ink: #f6f1ec;
+  --on-ink-muted: #b8aea7;
+
+  /* ---- lines ---------------------------------------------------------- */
+  --line: #ece1dd;
+  --line-strong: #d7c9c3;
+  /* Borders that carry state need 3:1, which decorative hairlines do not. */
+  --line-state: #88817e;
+  --line-on-ink: #46403c;
+
+  /* ---- type ----------------------------------------------------------- */
+  --font-display: 'Bodoni Moda', 'Didot', Georgia, 'Times New Roman', serif;
+  --font-body: 'Host Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+
+  /* Fluid from 360px to 1440px. Tracking tightens as size grows, which is the
+     single most telling difference between set and unset display type. */
+  --fs-display: clamp(3rem, 1.8333rem + 5.1852vw, 6.5rem);
+  --fs-h1: clamp(2.25rem, 1.5833rem + 2.963vw, 4.25rem);
+  --fs-h2: clamp(1.75rem, 1.4167rem + 1.4815vw, 2.75rem);
+  --fs-h3: clamp(1.375rem, 1.2083rem + 0.7407vw, 1.875rem);
+  --fs-h4: clamp(1.1875rem, 1.125rem + 0.2778vw, 1.375rem);
+  --fs-lead: clamp(1.1875rem, 1.125rem + 0.2778vw, 1.375rem);
+  --fs-body: clamp(1.0625rem, 1.0417rem + 0.0926vw, 1.125rem);
+  --fs-small: clamp(0.9375rem, 0.9271rem + 0.0463vw, 0.9688rem);
+  --fs-caption: clamp(0.8125rem, 0.8021rem + 0.0463vw, 0.8438rem);
+  --fs-overline: clamp(0.75rem, 0.7396rem + 0.0463vw, 0.7813rem);
+
+  /* ---- spacing: 4px steps inside components, 8px for layout ----------- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /**
+   * Generous but not endless. Premium design reads as roughly 1.5x the
+   * vertical air of a template, which argues for more; a nine-section home
+   * page argues for less, because every extra 24px per section is another
+   * screen to scroll. These sit between the two: 48/56/72px on a phone,
+   * 72/96/128px on a desktop.
+   */
+  --section-sm: clamp(3rem, 2.5rem + 2.2222vw, 4.5rem);
+  --section: clamp(3.5rem, 2.6667rem + 3.7037vw, 6rem);
+  --section-lg: clamp(4.5rem, 3.3333rem + 5.1852vw, 8rem);
+  --gutter: clamp(1.25rem, 0.6667rem + 2.5926vw, 3rem);
+
+  /* ---- layout --------------------------------------------------------- */
+  --container: 1240px;
+  --container-wide: 1440px;
+  /* Measures in ch so they stay correct if the type scale changes. */
+  --measure-prose: min(66ch, 100%);
+  --measure-narrow: min(52ch, 100%);
+  --measure-lead: min(42ch, 100%);
+  /* 80px gives the wordmark room to breathe; 64 on phones, where every pixel
+     of the first screen counts. */
+  --header-h: 80px;
+
+  /* ---- motion --------------------------------------------------------- */
+  /* One entrance curve, one interaction curve. Instant start, long settle,
+     no overshoot: overshoot reads playful, which is the wrong register. */
+  --ease-entrance: cubic-bezier(0, 0, 0.3, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --dur-hover: 120ms;
+  --dur-ui: 240ms;
+  --dur-entrance: 400ms;
+
+  /* ---- aliases kept for the booking and auth components --------------- */
+  --color-primary: var(--rose-600);
+  --color-primary-dark: var(--rose-700);
+  --color-primary-tint: var(--sand-50);
+  --color-accent: var(--gold-500);
+  --color-bg: var(--canvas);
+  --color-surface: var(--surface);
+  --color-text: var(--ink-900);
+  --color-text-muted: var(--ink-600);
+  --color-text-faint: var(--ink-500);
+  --color-text-ghost: var(--ink-300);
+  --color-border: var(--line);
+  --color-border-strong: var(--line-state);
+  --font-heading: var(--font-display);
+  --container-max-width: var(--container);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Bodoni Moda defaults to its 11px design; without this, display sizes
+     render with text-weight hairlines and look muddy. */
+  font-optical-sizing: auto;
+  /* Anchor targets must not land underneath the sticky header. */
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--ink-800);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /**
+   * Paper grain, baked into the page background.
+   *
+   * The opacity is inside the SVG rather than applied to an overlay element:
+   * a fixed, full-viewport layer - especially a blended one - has to be
+   * recomposited on every scroll frame, which is enough to make a long page
+   * feel heavy. As a background image it is painted with the page and costs
+   * nothing to scroll. Deliberately not `background-attachment: fixed`, for
+   * the same reason.
+   */
+  background-color: var(--canvas);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-sm);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+}
+
+/* h4 drops to the sans: a high-contrast Didone gets weak below ~22px. */
+h4 {
+  font-family: var(--font-body);
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -0.005em;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-2xs);
+}
+
+p {
+  margin: 0 0 var(--space-md);
+}
+
+/* Links keep their underline at rest: colour alone is not an affordance. */
+a {
+  color: var(--rose-700);
+  text-decoration: underline;
+  text-decoration-thickness: 0.05em;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in oklch, currentColor 45%, transparent);
+  transition: color var(--dur-hover) var(--ease-standard),
+    text-decoration-color var(--dur-hover) var(--ease-standard);
+
+  &:hover {
+    color: var(--ink-900);
+    text-decoration-color: currentColor;
+  }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink-900);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------- *
+ * Typographic utilities
+ * ---------------------------------------------------------------------- */
+
+/** Letter-spaced label above a heading. Uppercase needs the tracking. */
+.eyebrow {
+  display: block;
+  margin: 0 0 var(--space-sm);
+  font-size: var(--fs-overline);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rose-700);
+}
+
+.eyebrow--muted {
+  color: var(--ink-600);
+}
+
+.eyebrow--on-ink {
+  color: var(--gold-300);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  color: var(--ink-900);
+  margin: 0;
+  text-wrap: balance;
+}
+
+/** The sentence under a page heading. */
+.lede {
+  max-width: var(--measure-lead);
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--ink-700);
+}
+
+/** Long-form body copy: journal posts, service detail, About. */
+.prose {
+  max-width: var(--measure-prose);
+  line-height: 1.7;
+  color: var(--ink-800);
+
+  p {
+    /* Baymard's under-used recommendation: a 2em gap between paragraphs. */
+    margin: 0 0 2em;
+  }
+
+  h2,
+  h3 {
+    margin-top: var(--space-xl);
+  }
+
+  ul,
+  ol {
+    margin: 0 0 2em;
+    padding-left: 1.25rem;
+  }
+
+  li {
+    margin-bottom: var(--space-2xs);
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------- *
+ * Layout
+ * ---------------------------------------------------------------------- */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.container--wide {
+  max-width: var(--container-wide);
+}
+
+.container--narrow {
+  max-width: 860px;
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+.section--sm {
+  padding-block: var(--section-sm);
+}
+
+.section--lg {
+  padding-block: var(--section-lg);
+}
+
+/* Grounds change by one step at a time, and never more than three per page. */
+.section--sand {
+  background: var(--sand-100);
+}
+
+.section--sand-50 {
+  background: var(--sand-50);
+}
+
+/** The single dark band on a page, for the closing invitation. */
+.section--ink {
+  background: var(--ink-surface);
+  color: var(--on-ink);
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--on-ink);
+  }
+
+  p {
+    color: var(--on-ink-muted);
+  }
+
+  a:not(.btn) {
+    color: var(--gold-300);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.section-head {
+  max-width: 54ch;
+  margin-bottom: var(--space-2xl);
+
+  p {
+    margin-bottom: 0;
+    font-size: var(--fs-lead);
+    line-height: 1.55;
+    color: var(--ink-700);
+  }
+}
+
+.section-head--center {
+  margin-inline: auto;
+  text-align: center;
+
+  p {
+    margin-inline: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------- *
+ * Components
+ * ---------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-height: 48px;
+  padding: 0 1.75rem;
+  border: 1px solid var(--rose-700);
+  border-radius: 0;
+  background: var(--rose-700);
+  color: #fff;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  /* Ground and border only: a button that lifts or scales under the cursor is
+     a dated tell. */
+  transition: background-color var(--dur-hover) var(--ease-standard),
+    border-color var(--dur-hover) var(--ease-standard), color var(--dur-hover) var(--ease-standard);
+
+  &:hover {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: #fff;
+    text-decoration: none;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &.btn-outline {
+    background: transparent;
+    border-color: var(--line-strong);
+    color: var(--ink-900);
+
+    &:hover {
+      background: var(--ink-900);
+      border-color: var(--ink-900);
+      color: #fff;
+    }
+  }
+
+  &.btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink-800);
+
+    &:hover {
+      background: var(--sand-100);
+      border-color: var(--sand-100);
+      color: var(--ink-900);
+    }
+  }
+
+  /* On the dark band, where gold and ivory finally get to work. */
+  &.btn-on-ink {
+    background: var(--canvas);
+    border-color: var(--canvas);
+    color: var(--ink-900);
+
+    &:hover {
+      background: var(--gold-300);
+      border-color: var(--gold-300);
+      color: var(--ink-900);
+    }
+  }
+
+  &.btn-outline-ink {
+    background: transparent;
+    border-color: var(--line-on-ink);
+    color: var(--on-ink);
+
+    &:hover {
+      background: var(--canvas);
+      border-color: var(--canvas);
+      color: var(--ink-900);
+    }
+  }
+
+  &.btn-sm {
+    min-height: 40px;
+    padding: 0 1.25rem;
+    font-size: var(--fs-caption);
+  }
+
+  &.btn-lg {
+    min-height: 56px;
+    padding: 0 2.25rem;
+    font-size: var(--fs-body);
+  }
+}
+
+/** Secondary action: letter-spaced caps earn their place at small sizes. */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-overline);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--rose-700);
+
+  &::after {
+    content: '\2192';
+    letter-spacing: 0;
+    transition: transform var(--dur-ui) var(--ease-standard);
+  }
+
+  &:hover {
+    color: var(--ink-900);
+    text-decoration: none;
+  }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: var(--space-lg);
+  transition: border-color var(--dur-ui) var(--ease-standard),
+    background-color var(--dur-ui) var(--ease-standard);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 28px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line-state);
+  border-radius: 0;
+  background: var(--sand-100);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--ink-800);
+}
+
+/** Short editorial rule above a heading: the one place gold works on paper. */
+.rule {
+  width: 48px;
+  height: 1px;
+  margin: var(--space-md) 0;
+  border: 0;
+  background: var(--gold-700);
+}
+
+.rule--center {
+  margin-inline: auto;
+}
+
+/** Page masthead: eyebrow, title, one sentence. Used by every inner page. */
+.page-head {
+  padding-block: var(--section) var(--section-sm);
+  background: radial-gradient(120% 90% at 50% 0%, var(--sand-50) 0%, var(--canvas) 70%);
+}
+
+/** Term/definition pairs, e.g. "Starts" / "From booking". */
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2xs) var(--space-md);
+  margin: 0 0 var(--space-lg);
+
+  dt {
+    font-size: var(--fs-overline);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+    padding-top: 0.2em;
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--ink-800);
+  }
+}
+
+/* ---- disclosure list (FAQ) ------------------------------------------- */
+
+/* Native <details>, so it opens with no JavaScript and is announced
+   correctly by screen readers without any ARIA of our own. */
+.faq {
+  border-top: 1px solid var(--line);
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq__question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  color: var(--ink-900);
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    color: var(--rose-700);
+  }
+}
+
+.faq__marker {
+  position: relative;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+  }
+
+  &::before {
+    top: 50%;
+    left: 0;
+    width: 14px;
+    height: 1px;
+  }
+
+  &::after {
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 14px;
+  }
+}
+
+/* The plus becomes a minus when open. */
+.faq__item[open] .faq__marker::after {
+  display: none;
+}
+
+.faq__answer {
+  max-width: var(--measure-prose);
+  margin: 0;
+  padding-bottom: var(--space-md);
+  color: var(--ink-700);
+}
+
+/* ---- closing invitation ---------------------------------------------- */
+
+.closing {
+  text-align: center;
+
+  p {
+    max-width: 48ch;
+    margin-inline: auto;
+    margin-bottom: var(--space-lg);
+    font-size: var(--fs-lead);
+  }
+}
+
+.closing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  justify-content: center;
+}
+
+/* ---- forms ----------------------------------------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.field__label {
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  color: var(--ink-700);
+}
+
+.field__hint {
+  font-size: var(--fs-caption);
+  color: var(--ink-600);
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--surface);
+  font-family: inherit;
+  /* Must stay at or above 16px, or iOS Safari zooms the page on focus. */
+  font-size: var(--fs-body);
+  color: var(--ink-900);
+  transition: border-color var(--dur-hover) var(--ease-standard);
+
+  &::placeholder {
+    color: var(--ink-500);
+  }
+
+  &:hover {
+    border-color: var(--ink-500);
+  }
+
+  &:focus-visible {
+    border-color: var(--ink-700);
+    outline: 2px solid var(--ink-900);
+    outline-offset: 2px;
+  }
+}
+
+.field textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin: 0;
+  color: #96271f;
+  font-size: var(--fs-caption);
+}
+
+/* A form column should never be wider than its reading measure. */
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: var(--measure-narrow);
+}
+
+/* ---------------------------------------------------------------------- *
+ * Accessibility helpers
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Available to screen readers and keyboard users, invisible on screen. Used
+ * heavily by the booking calendar, where a bare date numeral carries no
+ * meaning without its month, weekday and availability.
+ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: var(--space-sm);
+  z-index: 100;
+  padding: 0.7rem 1.1rem;
+  background: var(--ink-900);
+  color: #fff;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  text-decoration: none;
+  transform: translateY(-120%);
+
+  &:focus-visible {
+    transform: translateY(0);
+    color: #fff;
+  }
+}
+
+/* The paper grain lives on the body background, above - see the note there
+   for why it is not an overlay element. Sections with their own ground paint
+   over it, which is why the tints stay flat and the canvas looks like paper. */
+
+/* ---------------------------------------------------------------------- *
+ * Motion
+ *
+ * Everything below is opt-in. With reduced motion requested, these rules
+ * never apply: elements are simply already in place, with no transitions
+ * declared and nothing hidden waiting to be revealed.
+ * ---------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /**
+   * Scroll reveal, applied by the appScrollReveal directive. Only secondary
+   * content gets this - headings, images, cards. Never body copy, form
+   * fields, prices or the booking CTA: a reader cannot tell a deliberate
+   * reveal delay from a slow site.
+   */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity var(--dur-entrance) var(--ease-entrance),
+      transform var(--dur-entrance) var(--ease-entrance);
+  }
+
+  .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  .link-arrow:hover::after {
+    transform: translateX(4px);
+  }
+
+  .skip-link {
+    transition: transform var(--dur-ui) var(--ease-standard);
+  }
+}
+
+/* Scroll fading is actively unhelpful on small screens: it narrows the
+   viewport's worth of visible content and fakes the end of the page. */
+@media (max-width: 760px) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 880px) {
+  :root {
+    --header-h: 64px;
+  }
+}
