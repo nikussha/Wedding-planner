@@ -1,0 +1,77 @@
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow">About</span>
+    <h1>{{ story()?.title || 'The people behind the planning' }}</h1>
+    @if (region()) {
+      <p class="lede">Planning weddings in {{ region() }}, and wherever else you take us.</p>
+    }
+  </div>
+</header>
+
+<section class="section">
+  <div class="container story">
+    <div class="story__copy prose">
+      @if (story()?.body) {
+        <p class="story__opening">{{ story()?.body }}</p>
+      } @else {
+        <p class="story__opening">
+          This page is where your own story goes — how you started, what kind of weddings you love,
+          and why couples should trust you with theirs. Add it under Site Content in the admin
+          panel.
+        </p>
+      }
+    </div>
+
+    @if (portrait(); as photo) {
+      <figure class="story__figure">
+        <img
+          [src]="photo.url"
+          [alt]="photo.alt || ''"
+          loading="lazy"
+          decoding="async"
+          width="720"
+          height="900"
+        />
+        @if (photo.caption) {
+          <figcaption>{{ photo.caption }}</figcaption>
+        }
+      </figure>
+    }
+  </div>
+</section>
+
+@if (steps().length) {
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head" appScrollReveal>
+        <span class="eyebrow">The experience</span>
+        <h2>{{ processHeading() }}</h2>
+      </div>
+
+      <ol class="experience">
+        @for (step of steps(); track step.id; let i = $index) {
+          <li class="experience__step" [appScrollReveal]="i * 60">
+            <span class="experience__number">{{ i + 1 }}</span>
+            <div>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.body }}</p>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+}
+
+<section class="section section--ink">
+  <div class="container container--narrow closing">
+    <h2>{{ ctaHeading() }}</h2>
+    @if (ctaBody()) {
+      <p>{{ ctaBody() }}</p>
+    }
+    <div class="closing__actions">
+      <a class="btn btn-on-ink" routerLink="/booking">Book a consultation</a>
+      <a class="btn btn-outline-ink" routerLink="/contact">Send a note instead</a>
+    </div>
+  </div>
+</section>

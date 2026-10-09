@@ -3,31 +3,42 @@
 </div>
 
 @if (loading()) {
-  <p>Loading…</p>
+  <p>Loading&hellip;</p>
 } @else {
-  <div class="sections">
-    @for (section of sections; track section.key) {
-      <div class="card section-card">
-        <h2>{{ section.label }}</h2>
-        <p class="section-description">{{ section.description }}</p>
+  @for (group of groups; track group.name) {
+    <section class="group">
+      <h2 class="group__title">{{ group.name }}</h2>
 
-        <form [formGroup]="forms.get(section.key)!" (ngSubmit)="save(section.key)">
-          <label [for]="section.key + '-title'">Title</label>
-          <input [id]="section.key + '-title'" type="text" formControlName="title" />
+      <div class="sections">
+        @for (section of group.sections; track section.key) {
+          <div class="card section-card" [class.section-card--compact]="section.singleValue">
+            <h3>{{ section.label }}</h3>
+            <p class="section-description">{{ section.description }}</p>
 
-          <label [for]="section.key + '-body'">Body</label>
-          <textarea [id]="section.key + '-body'" rows="5" formControlName="body"></textarea>
+            <form [formGroup]="forms.get(section.key)!" (ngSubmit)="save(section.key)">
+              @if (!section.singleValue) {
+                <label [for]="section.key + '-title'">Title</label>
+                <input [id]="section.key + '-title'" type="text" formControlName="title" />
 
-          <div class="section-actions">
-            <button type="submit" class="btn" [disabled]="savingKey() === section.key">
-              {{ savingKey() === section.key ? 'Saving…' : 'Save' }}
-            </button>
-            @if (savedKey() === section.key) {
-              <span class="saved-message">Saved.</span>
-            }
+                <label [for]="section.key + '-body'">Body</label>
+                <textarea [id]="section.key + '-body'" rows="5" formControlName="body"></textarea>
+              } @else {
+                <label [for]="section.key + '-body'">{{ section.bodyLabel || 'Value' }}</label>
+                <input [id]="section.key + '-body'" type="text" formControlName="body" />
+              }
+
+              <div class="section-actions">
+                <button type="submit" class="btn" [disabled]="savingKey() === section.key">
+                  {{ savingKey() === section.key ? 'Saving…' : 'Save' }}
+                </button>
+                @if (savedKey() === section.key) {
+                  <span class="saved-message">Saved.</span>
+                }
+              </div>
+            </form>
           </div>
-        </form>
+        }
       </div>
-    }
-  </div>
+    </section>
+  }
 }

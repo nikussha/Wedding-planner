@@ -1,0 +1,181 @@
+<div class="page-header">
+  <h1>{{ config().title }}</h1>
+  @if (!addingNew()) {
+    <button type="button" class="btn btn-sm" (click)="startAdd()">
+      Add {{ config().itemNoun }}
+    </button>
+  }
+</div>
+
+<p class="intro">{{ config().description }}</p>
+
+@if (loading()) {
+  <p>Loading&hellip;</p>
+} @else {
+  @if (addingNew()) {
+    <div class="card editor editor--new">
+      <h2 class="editor__title">New {{ config().itemNoun }}</h2>
+
+      <form [formGroup]="newForm" (ngSubmit)="saveNew()">
+        @for (field of config().fields; track field.key) {
+          <div class="field">
+            <label [for]="'new-' + field.key">
+              {{ field.label }}
+              @if (!field.required) {
+                <span class="field__optional">optional</span>
+              }
+            </label>
+
+            @if (field.type === 'textarea' || field.type === 'lines') {
+              <textarea
+                [id]="'new-' + field.key"
+                [formControlName]="field.key"
+                [rows]="field.rows || 3"
+              ></textarea>
+            } @else {
+              <input [id]="'new-' + field.key" type="text" [formControlName]="field.key" />
+            }
+
+            @if (field.hint) {
+              <span class="field__hint">{{ field.hint }}</span>
+            }
+            @if (fieldControlInvalid(newForm, field)) {
+              <p class="form-error">{{ fieldError(newForm, field) }}</p>
+            }
+          </div>
+        }
+
+        <div class="editor__actions">
+          <button type="submit" class="btn btn-sm" [disabled]="savingNew()">
+            {{ savingNew() ? 'Adding…' : 'Add' }}
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="cancelAdd()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (items().length === 0) {
+    <div class="card">
+      <p class="empty">
+        Nothing here yet. {{ config().emptyNote }}
+      </p>
+    </div>
+  } @else {
+    <p class="count">
+      {{ publishedCount() }} of {{ items().length }} shown on the site
+      @if (publishedCount() === 0) {
+        &mdash; {{ config().emptyNote }}
+      }
+    </p>
+
+    <ul class="rows">
+      @for (item of items(); track item.id; let i = $index; let first = $first; let last = $last) {
+        <li class="row" [class.row--hidden]="!item.published">
+          <div class="row__head">
+            <div class="row__order">
+              <button
+                type="button"
+                class="row__move"
+                [disabled]="first || busyId() === item.id"
+                (click)="move(item, -1)"
+                [attr.aria-label]="'Move ' + summary(item) + ' up'"
+              >
+                &uarr;
+              </button>
+              <button
+                type="button"
+                class="row__move"
+                [disabled]="last || busyId() === item.id"
+                (click)="move(item, 1)"
+                [attr.aria-label]="'Move ' + summary(item) + ' down'"
+              >
+                &darr;
+              </button>
+            </div>
+
+            <div class="row__summary">
+              <span class="row__title">{{ summary(item) }}</span>
+              @if (!item.published) {
+                <span class="badge badge-draft">Hidden</span>
+              }
+            </div>
+
+            <div class="row__actions">
+              @if (editingId() === item.id) {
+                <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">
+                  Close
+                </button>
+              } @else {
+                <button type="button" class="btn btn-outline btn-sm" (click)="startEdit(item)">
+                  Edit
+                </button>
+              }
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                [disabled]="busyId() === item.id"
+                (click)="togglePublished(item)"
+              >
+                {{ item.published ? 'Hide' : 'Show' }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm row__delete"
+                [disabled]="busyId() === item.id"
+                (click)="remove(item)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+
+          @if (editingId() === item.id) {
+            <form class="editor" [formGroup]="editForm" (ngSubmit)="saveEdit(item)">
+              @for (field of config().fields; track field.key) {
+                <div class="field">
+                  <label [for]="item.id + '-' + field.key">
+                    {{ field.label }}
+                    @if (!field.required) {
+                      <span class="field__optional">optional</span>
+                    }
+                  </label>
+
+                  @if (field.type === 'textarea' || field.type === 'lines') {
+                    <textarea
+                      [id]="item.id + '-' + field.key"
+                      [formControlName]="field.key"
+                      [rows]="field.rows || 3"
+                    ></textarea>
+                  } @else {
+                    <input
+                      [id]="item.id + '-' + field.key"
+                      type="text"
+                      [formControlName]="field.key"
+                    />
+                  }
+
+                  @if (field.hint) {
+                    <span class="field__hint">{{ field.hint }}</span>
+                  }
+                  @if (fieldControlInvalid(editForm, field)) {
+                    <p class="form-error">{{ fieldError(editForm, field) }}</p>
+                  }
+                </div>
+              }
+
+              <div class="editor__actions">
+                <button type="submit" class="btn btn-sm" [disabled]="busyId() === item.id">
+                  {{ busyId() === item.id ? 'Saving…' : 'Save' }}
+                </button>
+                <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+        </li>
+      }
+    </ul>
+  }
+}

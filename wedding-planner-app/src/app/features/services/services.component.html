@@ -1,0 +1,130 @@
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow">Services</span>
+    <h1>{{ heading() }}</h1>
+    @if (blurb()) {
+      <p class="lede">{{ blurb() }}</p>
+    }
+  </div>
+</header>
+
+@if (tiers().length) {
+  <!-- A contents page for the tiers: a print convention, and it lets someone
+       jump straight to the one that sounds like them. -->
+  <nav class="section section--sm index" aria-label="Services">
+    <div class="container">
+      <ol class="index__list">
+        @for (tier of tiers(); track tier.id; let i = $index) {
+          <li class="index__row">
+            <a class="index__link" [href]="'#' + tier.slug">
+              <span class="index__number">{{ i + 1 }}</span>
+              <span class="index__name">{{ tier.name }}</span>
+              <span class="index__starts">{{ tier.startsAt }}</span>
+            </a>
+          </li>
+        }
+      </ol>
+    </div>
+  </nav>
+
+  @for (tier of tiers(); track tier.id; let i = $index; let odd = $odd) {
+    <section class="section tier-block" [class.section--sand]="odd" [id]="tier.slug">
+      <div class="container">
+        <div class="tier-block__inner">
+          <div class="tier-block__intro">
+            <span class="eyebrow eyebrow--muted">Option {{ i + 1 }}</span>
+            <h2>{{ tier.name }}</h2>
+            <p class="lede">{{ tier.forWho }}</p>
+
+            <dl class="facts">
+              <dt>Starts</dt>
+              <dd>{{ tier.startsAt }}</dd>
+              <dt>Investment</dt>
+              <dd>
+                @if (tier.investment) {
+                  {{ tier.investment }}
+                } @else {
+                  Shared with your proposal, after we have talked
+                }
+              </dd>
+            </dl>
+
+            <a class="btn" routerLink="/booking">Book a consultation</a>
+          </div>
+
+          <div class="tier-block__detail">
+            @if (tier.includedBefore.length) {
+              <div class="included" appScrollReveal>
+                <h3 class="included__title">Before the wedding</h3>
+                <ul class="included__list">
+                  @for (item of tier.includedBefore; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (tier.includedOnDay.length) {
+              <div class="included" appScrollReveal>
+                <h3 class="included__title">On the day</h3>
+                <ul class="included__list">
+                  @for (item of tier.includedOnDay; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (tier.excluded.length) {
+              <div class="excluded">
+                <h3 class="included__title">Not included</h3>
+                <ul class="excluded__list">
+                  @for (item of tier.excluded; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+}
+
+<!-- Objection handling sits here rather than on a page nobody visits. -->
+@if (faqs().length) {
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="section-head" appScrollReveal>
+        <span class="eyebrow">Questions</span>
+        <h2>{{ faqHeading() }}</h2>
+      </div>
+
+      <div class="faq">
+        @for (faq of faqs(); track faq.id) {
+          <details class="faq__item">
+            <summary class="faq__question">
+              <span>{{ faq.question }}</span>
+              <span class="faq__marker" aria-hidden="true"></span>
+            </summary>
+            <p class="faq__answer">{{ faq.answer }}</p>
+          </details>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section section--ink">
+  <div class="container container--narrow closing">
+    <h2>{{ ctaHeading() }}</h2>
+    @if (ctaBody()) {
+      <p>{{ ctaBody() }}</p>
+    }
+    <div class="closing__actions">
+      <a class="btn btn-on-ink" routerLink="/booking">Book a consultation</a>
+      <a class="btn btn-outline-ink" routerLink="/contact">Send a note instead</a>
+    </div>
+  </div>
+</section>
