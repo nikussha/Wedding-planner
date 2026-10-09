@@ -44,6 +44,48 @@ export const routes: Routes = [
         loadComponent: () => import('./features/bookings/bookings.component').then((m) => m.BookingsComponent),
       },
       {
+        path: 'services',
+        data: { listKey: 'service-tiers' },
+        loadComponent: () =>
+          import('./features/content-lists/content-list.component').then(
+            (m) => m.ContentListComponent,
+          ),
+      },
+      {
+        path: 'process',
+        data: { listKey: 'process' },
+        loadComponent: () =>
+          import('./features/content-lists/content-list.component').then(
+            (m) => m.ContentListComponent,
+          ),
+      },
+      {
+        path: 'faq',
+        data: { listKey: 'faq' },
+        loadComponent: () =>
+          import('./features/content-lists/content-list.component').then(
+            (m) => m.ContentListComponent,
+          ),
+      },
+      {
+        path: 'testimonials',
+        data: { listKey: 'testimonials' },
+        loadComponent: () =>
+          import('./features/content-lists/content-list.component').then(
+            (m) => m.ContentListComponent,
+          ),
+      },
+      {
+        path: 'enquiries',
+        loadComponent: () =>
+          import('./features/enquiries/enquiries.component').then((m) => m.EnquiriesComponent),
+      },
+      {
+        path: 'availability',
+        loadComponent: () =>
+          import('./features/availability/availability.component').then((m) => m.AvailabilityComponent),
+      },
+      {
         path: 'users',
         loadComponent: () => import('./features/users/users.component').then((m) => m.UsersComponent),
       },

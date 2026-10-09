@@ -1,21 +1,52 @@
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a class="site-header__brand" routerLink="/">Wedding Planner</a>
-
-    <nav class="site-header__nav" aria-label="Main navigation">
-      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-      <a routerLink="/blog" routerLinkActive="is-active">Blog</a>
-    </nav>
-
-    <div class="site-header__actions">
-      @if (isAuthenticated()) {
-        <a class="btn" routerLink="/booking">Book Now</a>
-        <span class="site-header__user">{{ user()?.name }}</span>
-        <button type="button" class="btn btn-ghost" (click)="logout()">Logout</button>
-      } @else {
-        <a class="btn btn-ghost" routerLink="/login">Login</a>
-        <a class="btn" routerLink="/register">Register</a>
+<header class="masthead" [class.is-scrolled]="scrolled()" [class.is-open]="menuOpen()">
+  <div class="container masthead__inner">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <span class="brand__name">{{ siteName() }}</span>
+      @if (region()) {
+        <span class="brand__region">{{ region() }}</span>
       }
+    </a>
+
+    <button
+      type="button"
+      class="masthead__toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="site-menu"
+      aria-label="Menu"
+    >
+      <span class="masthead__bar"></span>
+      <span class="masthead__bar"></span>
+    </button>
+
+    <div class="masthead__menu" id="site-menu">
+      <nav class="nav" aria-label="Main navigation">
+        @for (link of navLinks; track link.path) {
+          <a
+            class="nav__link"
+            [routerLink]="link.path"
+            routerLinkActive="is-active"
+            (click)="closeMenu()"
+          >
+            {{ link.label }}
+          </a>
+        }
+      </nav>
+
+      <div class="masthead__actions">
+        <!-- Full size, not btn-sm: this is the one thing the whole site asks
+             visitors to do. -->
+        <a class="btn" routerLink="/booking" (click)="closeMenu()">Book a consultation</a>
+
+        @if (isAuthenticated()) {
+          <span class="masthead__account">
+            <span class="masthead__who">{{ firstName() }}</span>
+            <button type="button" class="masthead__quiet" (click)="logout()">Sign out</button>
+          </span>
+        } @else {
+          <a class="masthead__quiet" routerLink="/login" (click)="closeMenu()">Sign in</a>
+        }
+      </div>
     </div>
   </div>
 </header>

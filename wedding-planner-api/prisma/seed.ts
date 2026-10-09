@@ -1,8 +1,32 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+import { basename, join } from 'node:path';
 import { Role } from '../src/common/enums/role.enum';
+import { seedMarketingContent } from './seed-marketing';
 
 const prisma = new PrismaClient();
+
+const SEED_ASSETS_DIR = join(__dirname, 'seed-assets');
+const UPLOADS_DIR = join(process.cwd(), 'uploads');
+
+/**
+ * Copies a tracked seed asset into the (git-ignored) uploads dir if it is not
+ * already present, so seeded Photo rows always resolve to a real file on disk.
+ */
+function ensureUploadExists(url: string): void {
+  const fileName = basename(url);
+  const source = join(SEED_ASSETS_DIR, fileName);
+  const dest = join(UPLOADS_DIR, fileName);
+  if (!existsSync(source)) {
+    console.warn(`Seed asset missing, skipping copy: ${source}`);
+    return;
+  }
+  mkdirSync(UPLOADS_DIR, { recursive: true });
+  if (!existsSync(dest)) {
+    copyFileSync(source, dest);
+  }
+}
 
 const PASSWORD_SALT_ROUNDS = 10;
 const ADMIN_EMAIL = 'admin@example.com';
@@ -43,25 +67,39 @@ async function main() {
 
   const samplePhotos = [
     {
-      url: '/uploads/sample-1.jpg',
+      url: '/uploads/sample-1.png',
       alt: 'Wedding ceremony under string lights',
       caption: 'Evening ceremony setup',
       order: 0,
     },
     {
-      url: '/uploads/sample-2.jpg',
+      url: '/uploads/sample-2.png',
       alt: 'Reception table with floral centerpieces',
       caption: 'Reception decor',
       order: 1,
     },
   ];
 
+  // Remove legacy sample rows that pointed at .jpg files which were never on disk.
+  await prisma.photo.deleteMany({
+    where: { url: { in: ['/uploads/sample-1.jpg', '/uploads/sample-2.jpg'] } },
+  });
+
   for (const photo of samplePhotos) {
+    ensureUploadExists(photo.url);
     const existing = await prisma.photo.findFirst({ where: { url: photo.url } });
     if (!existing) {
       await prisma.photo.create({ data: photo });
     }
   }
+
+  // Opening hours for the booking calendar. Created once; later edits made in
+  // the admin panel are preserved on re-seed.
+  await prisma.availabilitySetting.upsert({
+    where: { id: 'default' },
+    update: {},
+    create: { id: 'default' },
+  });
 
   await prisma.blogPost.upsert({
     where: { slug: 'welcome-to-our-blog' },
@@ -77,6 +115,8 @@ async function main() {
       authorId: admin.id,
     },
   });
+
+  await seedMarketingContent(prisma);
 
   console.log('Seed complete.');
   console.log(`Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);

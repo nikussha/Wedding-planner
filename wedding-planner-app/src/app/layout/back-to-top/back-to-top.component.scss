@@ -1,0 +1,54 @@
+.to-top {
+  position: fixed;
+  right: var(--space-md);
+  bottom: var(--space-md);
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink-900);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+
+  /* Out of the way until it is wanted, and never focusable while hidden. */
+  opacity: 0;
+  visibility: hidden;
+
+  &:hover {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: #fff;
+  }
+}
+
+.to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/**
+ * Hidden on small screens on purpose: the booking page carries a sticky
+ * action bar along the bottom there, and a floating button would sit on top
+ * of it. Phones also have momentum scrolling, so the journey back is quick
+ * anyway - and the footer carries a "back to top" link for those cases.
+ */
+@media (max-width: 880px) {
+  .to-top {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .to-top {
+    transition: opacity var(--dur-ui) var(--ease-standard),
+      visibility var(--dur-ui) var(--ease-standard),
+      background-color var(--dur-hover) var(--ease-standard),
+      color var(--dur-hover) var(--ease-standard);
+  }
+}

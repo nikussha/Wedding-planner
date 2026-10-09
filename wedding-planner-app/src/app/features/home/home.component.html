@@ -1,30 +1,110 @@
+<!-- 1. Hero: aesthetic match, who/what/where, one primary action -->
 <section class="hero">
   <div class="container hero__inner">
-    @if (hero()) {
-      <h1>{{ hero()?.title }}</h1>
-      <p class="hero__body">{{ hero()?.body }}</p>
+    <div class="hero__copy">
+      @if (region()) {
+        <span class="eyebrow">Wedding planning in {{ region() }}</span>
+      } @else {
+        <span class="eyebrow">Wedding planning</span>
+      }
+
+      <h1 class="display hero__headline">{{ headline() }}</h1>
+
+      @if (hero()?.body) {
+        <p class="lede hero__body">{{ hero()?.body }}</p>
+      }
+
+      <div class="hero__actions">
+        <a class="btn" routerLink="/booking">Book a consultation</a>
+        <a class="btn btn-outline" routerLink="/services">See how we help</a>
+      </div>
+
+      <p class="hero__note">A free, no-obligation conversation at a time you choose.</p>
+    </div>
+
+    @if (heroImage(); as photo) {
+      <figure class="hero__figure">
+        <!-- The hero image is the LCP element: never lazy-loaded. -->
+        <img
+          [src]="photo.url"
+          [alt]="photo.alt || ''"
+          fetchpriority="high"
+          decoding="async"
+          width="900"
+          height="1125"
+        />
+      </figure>
+    } @else {
+      <!-- With no photography yet, the hero stays typographic rather than
+           showing an empty frame. -->
+      <figure class="hero__figure hero__figure--empty" aria-hidden="true">
+        <span class="hero__monogram">W</span>
+      </figure>
     }
-    <a class="btn" routerLink="/booking">Book Your Date</a>
   </div>
 </section>
 
-@if (about()) {
-  <section class="about">
-    <div class="container">
-      <h2>{{ about()?.title }}</h2>
-      <p>{{ about()?.body }}</p>
+<!-- 2. Positioning: who we are, in the owner's own words -->
+@if (about(); as intro) {
+  <section class="section section--sand">
+    <div class="container container--narrow intro">
+      @if (intro.title) {
+        <h2 class="intro__title">{{ intro.title }}</h2>
+      }
+      <hr class="rule" />
+      @if (intro.body) {
+        <p class="intro__body">{{ intro.body }}</p>
+      }
+      <a class="link-arrow" routerLink="/about">More about us</a>
     </div>
   </section>
 }
 
-@if (photos().length) {
-  <section class="gallery">
+<!-- 3. Services preview: let visitors self-select a path -->
+@if (tiers().length) {
+  <section class="section">
     <div class="container">
-      <h2>Gallery</h2>
-      <div class="gallery__grid">
-        @for (photo of photos(); track photo.id) {
-          <figure class="gallery__item">
-            <img [src]="photo.url" [alt]="photo.alt ?? ''" loading="lazy" />
+      <div class="section-head section-head--center" appScrollReveal>
+        <span class="eyebrow">How we help</span>
+        <h2>{{ servicesHeading() }}</h2>
+        @if (servicesBlurb()) {
+          <p>{{ servicesBlurb() }}</p>
+        }
+      </div>
+
+      <div class="tiers">
+        @for (tier of tiers(); track tier.id; let i = $index) {
+          <article class="tier" [appScrollReveal]="i * 60">
+            <p class="tier__index">{{ i + 1 }}</p>
+            <h3 class="tier__name">{{ tier.name }}</h3>
+            <p class="tier__for">{{ tier.forWho }}</p>
+            <p class="tier__starts">
+              <span class="tier__starts-label">Starts</span>
+              {{ tier.startsAt }}
+            </p>
+            <a class="link-arrow" [routerLink]="['/services']" [fragment]="tier.slug">
+              What's included
+            </a>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- 4. The work itself -->
+@if (galleryPhotos().length) {
+  <section class="section">
+    <div class="container container--wide">
+      <div class="section-head" appScrollReveal>
+        <span class="eyebrow">Recent work</span>
+        <h2>{{ galleryHeading() }}</h2>
+      </div>
+
+      <div class="gallery">
+        @for (photo of galleryPhotos(); track photo.id; let i = $index) {
+          <figure class="gallery__item" [appScrollReveal]="rowDelay(i)">
+            <img [src]="photo.url" [alt]="photo.alt || ''" loading="lazy" decoding="async" />
             @if (photo.caption) {
               <figcaption>{{ photo.caption }}</figcaption>
             }
@@ -34,3 +114,130 @@
     </div>
   </section>
 }
+
+<!-- 5. Process: removes the "what happens next" hesitation -->
+@if (steps().length) {
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head section-head--center" appScrollReveal>
+        <span class="eyebrow">What happens next</span>
+        <h2>{{ processHeading() }}</h2>
+      </div>
+
+      <ol class="steps">
+        @for (step of steps(); track step.id; let i = $index) {
+          <li class="step" [appScrollReveal]="i * 60">
+            <span class="step__number">{{ i + 1 }}</span>
+            <h3 class="step__title">{{ step.title }}</h3>
+            <p class="step__body">{{ step.body }}</p>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+}
+
+<!-- 6. Proof, placed late where doubt peaks. Renders only when real. -->
+@if (testimonials().length) {
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head section-head--center" appScrollReveal>
+        <span class="eyebrow">In their words</span>
+        <h2>{{ testimonialsHeading() }}</h2>
+      </div>
+
+      <div class="quotes">
+        @for (testimonial of testimonials(); track testimonial.id; let i = $index) {
+          <figure class="quote" [appScrollReveal]="i * 60">
+            <blockquote class="quote__text">{{ testimonial.quote }}</blockquote>
+            <figcaption class="quote__who">
+              <span class="quote__names">{{ testimonial.names }}</span>
+              @if (testimonial.context) {
+                <span class="quote__context">{{ testimonial.context }}</span>
+              }
+            </figcaption>
+          </figure>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- 7. Journal teaser -->
+@if (latestPosts().length) {
+  <section class="section">
+    <div class="container">
+      <div class="section-head" appScrollReveal>
+        <span class="eyebrow">Journal</span>
+        <h2>{{ journalHeading() }}</h2>
+      </div>
+
+      <div class="posts">
+        @for (post of latestPosts(); track post.id; let i = $index) {
+          <article class="post-card" [appScrollReveal]="i * 60">
+            @if (post.coverImage) {
+              <a class="post-card__media" [routerLink]="['/blog', post.slug]">
+                <img [src]="post.coverImage" [alt]="post.title" loading="lazy" decoding="async" />
+              </a>
+            }
+            <div class="post-card__body">
+              @if (post.publishedAt) {
+                <p class="post-card__date">{{ post.publishedAt | date: 'd MMMM yyyy' }}</p>
+              }
+              <h3 class="post-card__title">
+                <a [routerLink]="['/blog', post.slug]">{{ post.title }}</a>
+              </h3>
+              @if (post.excerpt) {
+                <p class="post-card__excerpt">{{ post.excerpt }}</p>
+              }
+            </div>
+          </article>
+        }
+      </div>
+
+      <a class="link-arrow posts__all" routerLink="/blog">Read the journal</a>
+    </div>
+  </section>
+}
+
+<!-- 8. FAQ: the money question first -->
+@if (faqs().length) {
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="section-head" appScrollReveal>
+        <span class="eyebrow">Questions</span>
+        <h2>{{ faqHeading() }}</h2>
+      </div>
+
+      <div class="faq">
+        @for (faq of faqs(); track faq.id) {
+          <details class="faq__item">
+            <summary class="faq__question">
+              <span>{{ faq.question }}</span>
+              <span class="faq__marker" aria-hidden="true"></span>
+            </summary>
+            <p class="faq__answer">{{ faq.answer }}</p>
+          </details>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- 9. Closing invitation: the same ask as the hero -->
+<section class="section section--ink">
+  <!-- No reveal here: the closing CTA is the page's purpose, not decoration. -->
+  <div class="container container--narrow closing">
+    <h2>{{ closingCta()?.title || 'Shall we talk about your wedding?' }}</h2>
+    <p>
+      {{
+        closingCta()?.body ||
+          'Pick a time that suits you and tell us what you are imagining. There is no obligation, and no charge for the conversation.'
+      }}
+    </p>
+    <div class="closing__actions">
+      <a class="btn btn-on-ink" routerLink="/booking">Book a consultation</a>
+      <a class="btn btn-outline-ink" routerLink="/contact">Send a note instead</a>
+    </div>
+  </div>
+</section>

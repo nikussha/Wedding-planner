@@ -17,6 +17,7 @@ import { diskStorage } from 'multer';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
+import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { PhotosService } from './photos.service';
@@ -62,13 +63,13 @@ export class PhotosController {
 
   @Roles(Role.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdatePhotoDto) {
+  update(@Param('id', ParseCuidPipe) id: string, @Body() dto: UpdatePhotoDto) {
     return this.photosService.update(id, dto);
   }
 
   @Roles(Role.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseCuidPipe) id: string) {
     return this.photosService.remove(id);
   }
 }

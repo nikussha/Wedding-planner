@@ -35,10 +35,29 @@ export class PhotosComponent implements OnInit {
   }
 
   private load(): void {
-    this.photosService.getAll().subscribe((photos) => {
-      this.photos.set(photos);
-      this.loading.set(false);
+    this.photosService.getAll().subscribe({
+      next: (photos) => {
+        this.photos.set(photos);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
     });
+  }
+
+  /** Replaces a failed image (e.g. file missing on disk) with an inline placeholder. */
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img.dataset['fallback']) return; // avoid loop if the placeholder itself fails
+    img.dataset['fallback'] = 'true';
+    img.classList.add('img-missing');
+    img.src =
+      'data:image/svg+xml;charset=utf-8,' +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120">' +
+          '<rect width="160" height="120" fill="#f0eef0"/>' +
+          '<text x="80" y="64" font-family="sans-serif" font-size="12" fill="#9b8e95" ' +
+          'text-anchor="middle">image unavailable</text></svg>',
+      );
   }
 
   onFileSelected(event: Event): void {
@@ -73,11 +92,14 @@ export class PhotosComponent implements OnInit {
 
   updateField(photo: Photo, field: 'alt' | 'caption', value: string): void {
     this.savingId.set(photo.id);
-    this.photosService.update(photo.id, { [field]: value }).subscribe(() => {
-      this.savingId.set(null);
-      this.photos.update((photos) =>
-        photos.map((p) => (p.id === photo.id ? { ...p, [field]: value } : p)),
-      );
+    this.photosService.update(photo.id, { [field]: value }).subscribe({
+      next: () => {
+        this.savingId.set(null);
+        this.photos.update((photos) =>
+          photos.map((p) => (p.id === photo.id ? { ...p, [field]: value } : p)),
+        );
+      },
+      error: () => this.savingId.set(null),
     });
   }
 
@@ -98,7 +120,10 @@ export class PhotosComponent implements OnInit {
 
     photos.forEach((photo, index) => {
       if (photo.order !== index) {
-        this.photosService.update(photo.id, { order: index }).subscribe();
+        // On failure, reload from the server so the displayed order matches persisted state.
+        this.photosService.update(photo.id, { order: index }).subscribe({
+          error: () => this.load(),
+        });
       }
     });
 

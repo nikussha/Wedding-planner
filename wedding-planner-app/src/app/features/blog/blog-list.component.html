@@ -1,31 +1,96 @@
-<section class="blog-list">
+<header class="page-head">
   <div class="container">
-    <h1>From Our Blog</h1>
+    <span class="eyebrow">Journal</span>
+    <h1>{{ heading() }}</h1>
+    @if (blurb()) {
+      <p class="lede">{{ blurb() }}</p>
+    }
+  </div>
+</header>
 
-    @if (posts().length) {
-      <div class="blog-list__grid">
-        @for (post of posts(); track post.id) {
-          <article class="blog-card">
-            @if (post.coverImage) {
-              <a [routerLink]="['/blog', post.slug]">
-                <img [src]="post.coverImage" [alt]="post.title" loading="lazy" />
-              </a>
-            }
-            <div class="blog-card__body">
-              <h2><a [routerLink]="['/blog', post.slug]">{{ post.title }}</a></h2>
-              @if (post.publishedAt) {
-                <p class="blog-card__date">{{ post.publishedAt | date: 'longDate' }}</p>
-              }
-              @if (post.excerpt) {
-                <p class="blog-card__excerpt">{{ post.excerpt }}</p>
-              }
-              <a class="blog-card__link" [routerLink]="['/blog', post.slug]">Read more &rarr;</a>
-            </div>
-          </article>
-        }
+<section class="section">
+  <div class="container">
+    @if (loading()) {
+      <p class="state">Loading the journal&hellip;</p>
+    } @else if (error()) {
+      <p class="state" role="alert">
+        The journal could not be loaded just now. Please try again shortly.
+      </p>
+    } @else if (!posts().length) {
+      <div class="state state--empty">
+        <h2>Nothing published yet</h2>
+        <p>The first entries are being written. In the meantime, we are happy to talk.</p>
+        <a class="btn" routerLink="/booking">Book a consultation</a>
       </div>
     } @else {
-      <p class="blog-list__empty">No blog posts yet — check back soon!</p>
+      @if (featured(); as post) {
+        <article class="featured">
+          @if (post.coverImage) {
+            <a class="featured__media" [routerLink]="['/blog', post.slug]" tabindex="-1" aria-hidden="true">
+              <img
+                [src]="post.coverImage"
+                [alt]="post.title"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </a>
+          }
+          <div class="featured__body">
+            <span class="eyebrow">Latest</span>
+            <h2 class="featured__title">
+              <a [routerLink]="['/blog', post.slug]">{{ post.title }}</a>
+            </h2>
+            @if (post.excerpt) {
+              <p class="featured__excerpt">{{ post.excerpt }}</p>
+            }
+            <p class="meta">
+              @if (post.publishedAt) {
+                <span>{{ post.publishedAt | date: 'd MMMM yyyy' }}</span>
+              }
+              <span>{{ minutes(post.content) }} min read</span>
+            </p>
+            <a class="link-arrow" [routerLink]="['/blog', post.slug]">Read it</a>
+          </div>
+        </article>
+      }
+
+      @if (rest().length) {
+        <div class="posts">
+          @for (post of rest(); track post.id; let i = $index) {
+            <article class="post-card" [appScrollReveal]="i * 60">
+              @if (post.coverImage) {
+                <a class="post-card__media" [routerLink]="['/blog', post.slug]" tabindex="-1" aria-hidden="true">
+                  <img [src]="post.coverImage" [alt]="post.title" loading="lazy" decoding="async" />
+                </a>
+              }
+              <p class="meta">
+                @if (post.publishedAt) {
+                  <span>{{ post.publishedAt | date: 'd MMMM yyyy' }}</span>
+                }
+                <span>{{ minutes(post.content) }} min read</span>
+              </p>
+              <h3 class="post-card__title">
+                <a [routerLink]="['/blog', post.slug]">{{ post.title }}</a>
+              </h3>
+              @if (post.excerpt) {
+                <p class="post-card__excerpt">{{ post.excerpt }}</p>
+              }
+            </article>
+          }
+        </div>
+      }
     }
+  </div>
+</section>
+
+<section class="section section--ink">
+  <div class="container container--narrow closing">
+    <h2>{{ ctaHeading() }}</h2>
+    @if (ctaBody()) {
+      <p>{{ ctaBody() }}</p>
+    }
+    <div class="closing__actions">
+      <a class="btn btn-on-ink" routerLink="/booking">Book a consultation</a>
+    </div>
   </div>
 </section>

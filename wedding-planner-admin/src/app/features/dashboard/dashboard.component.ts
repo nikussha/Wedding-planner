@@ -1,10 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { BlogService } from '../../core/services/blog.service';
-import { BookingsService } from '../../core/services/bookings.service';
-import { UsersService } from '../../core/services/users.service';
+import { StatsService } from '../../core/services/stats.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,9 +10,7 @@ import { UsersService } from '../../core/services/users.service';
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  private readonly usersService = inject(UsersService);
-  private readonly bookingsService = inject(BookingsService);
-  private readonly blogService = inject(BlogService);
+  private readonly statsService = inject(StatsService);
 
   constructor() {
     inject(Title).setTitle('Dashboard | Wedding Planner Admin');
@@ -29,17 +24,16 @@ export class DashboardComponent implements OnInit {
   readonly publishedPostCount = signal(0);
 
   ngOnInit(): void {
-    forkJoin({
-      users: this.usersService.getAll(),
-      bookings: this.bookingsService.getAll(),
-      posts: this.blogService.getAll(),
-    }).subscribe(({ users, bookings, posts }) => {
-      this.userCount.set(users.length);
-      this.bookingCount.set(bookings.length);
-      this.pendingBookingCount.set(bookings.filter((b) => b.status === 'PENDING').length);
-      this.postCount.set(posts.length);
-      this.publishedPostCount.set(posts.filter((p) => p.published).length);
-      this.loading.set(false);
+    this.statsService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.userCount.set(stats.userCount);
+        this.bookingCount.set(stats.bookingCount);
+        this.pendingBookingCount.set(stats.pendingBookingCount);
+        this.postCount.set(stats.postCount);
+        this.publishedPostCount.set(stats.publishedPostCount);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
     });
   }
 }

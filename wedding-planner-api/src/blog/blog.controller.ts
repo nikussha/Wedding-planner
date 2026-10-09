@@ -3,6 +3,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
+import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { AuthenticatedUser } from '../common/types/authenticated-user.interface';
 import { BlogService } from './blog.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -20,7 +21,7 @@ export class BlogController {
 
   @Roles(Role.ADMIN)
   @Get('admin/:id')
-  findOneForAdmin(@Param('id') id: string) {
+  findOneForAdmin(@Param('id', ParseCuidPipe) id: string) {
     return this.blogService.findOneForAdmin(id);
   }
 
@@ -44,13 +45,13 @@ export class BlogController {
 
   @Roles(Role.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
+  update(@Param('id', ParseCuidPipe) id: string, @Body() dto: UpdatePostDto) {
     return this.blogService.update(id, dto);
   }
 
   @Roles(Role.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseCuidPipe) id: string) {
     return this.blogService.remove(id);
   }
 }

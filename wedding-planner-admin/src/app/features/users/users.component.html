@@ -28,7 +28,7 @@
             </td>
             <td>{{ user.createdAt | date: 'mediumDate' }}</td>
             <td>
-              @if (user.id === currentUserId) {
+              @if (user.id === currentUserId()) {
                 <span class="self-note">You</span>
               } @else {
                 <button

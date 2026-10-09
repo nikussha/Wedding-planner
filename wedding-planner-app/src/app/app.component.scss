@@ -1,4 +1,16 @@
+:host {
+  /* Keeps the footer at the bottom of short pages. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .site-main {
   display: block;
-  min-height: 60vh;
+  flex: 1 0 auto;
+
+  /* The skip link targets this, and it should not draw a focus ring. */
+  &:focus {
+    outline: none;
+  }
 }

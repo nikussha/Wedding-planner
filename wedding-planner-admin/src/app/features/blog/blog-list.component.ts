@@ -22,17 +22,21 @@ export class BlogListComponent implements OnInit {
   readonly loading = signal(true);
 
   ngOnInit(): void {
-    this.blogService.getAll().subscribe((posts) => {
-      this.posts.set(posts);
-      this.loading.set(false);
+    this.blogService.getAll().subscribe({
+      next: (posts) => {
+        this.posts.set(posts);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
     });
   }
 
   remove(post: BlogPost): void {
     if (!confirm(`Delete the post "${post.title}"?`)) return;
 
-    this.blogService.remove(post.id).subscribe(() => {
-      this.posts.update((posts) => posts.filter((p) => p.id !== post.id));
+    // The error interceptor surfaces failures; only mutate the list on success.
+    this.blogService.remove(post.id).subscribe({
+      next: () => this.posts.update((posts) => posts.filter((p) => p.id !== post.id)),
     });
   }
 }

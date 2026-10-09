@@ -36,6 +36,12 @@
     object-fit: cover;
     border-radius: 6px;
     margin-bottom: 0.25rem;
+
+    &.img-missing {
+      object-fit: contain;
+      background: #f0eef0;
+      border: 1px dashed #d8d2d6;
+    }
   }
 
   label {

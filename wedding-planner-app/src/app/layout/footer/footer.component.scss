@@ -1,30 +1,102 @@
-.site-footer {
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
-  margin-top: 3rem;
+.footer {
+  margin-top: auto;
+  padding-top: var(--space-3xl);
+  background: var(--sand-100);
+  border-top: 1px solid var(--line);
 }
 
-.site-footer__inner {
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(2, minmax(0, 1fr));
+  gap: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}
+
+.footer__brand {
+  max-width: 28ch;
+}
+
+.footer__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+}
+
+.footer__region {
+  margin: var(--space-3xs) 0 var(--space-md);
+  font-size: var(--fs-small);
+  color: var(--ink-600);
+}
+
+.footer__cta {
+  margin-top: var(--space-3xs);
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  a {
+    color: var(--ink-600);
+    font-size: var(--fs-small);
+
+    &:hover {
+      color: var(--rose-700);
+    }
+  }
+}
+
+.footer__heading {
+  margin: 0 0 var(--space-3xs);
+  font-family: var(--font-body);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-900);
+}
+
+.footer__top {
+  color: var(--ink-600);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--rose-700);
+  }
+}
+
+.footer__legal {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
+  gap: var(--space-xs);
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--line);
+  color: var(--ink-500);
+  font-size: var(--fs-caption);
+
+  p {
+    margin: 0;
+  }
 }
 
-.site-footer__nav {
-  display: flex;
-  gap: 1.25rem;
+@media (max-width: 760px) {
+  .footer__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
 
-  a {
-    color: var(--color-text-muted);
+  .footer__brand {
+    grid-column: 1 / -1;
+  }
+}
 
-    &:hover {
-      color: var(--color-primary);
-    }
+@media (max-width: 460px) {
+  .footer__inner {
+    grid-template-columns: 1fr;
   }
 }

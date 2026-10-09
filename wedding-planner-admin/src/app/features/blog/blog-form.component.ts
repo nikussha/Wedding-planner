@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -17,6 +18,8 @@ export class BlogFormComponent implements OnInit {
   private readonly blogService = inject(BlogService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly title = inject(Title);
 
   readonly postId = signal<string | null>(null);
   readonly isEditMode = signal(false);
@@ -40,15 +43,19 @@ export class BlogFormComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
-    this.form.controls.title.valueChanges.subscribe((title) => {
-      if (!this.slugTouched) {
-        this.form.controls.slug.setValue(slugify(title), { emitEvent: false });
-      }
-    });
+    this.form.controls.title.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((title) => {
+        if (!this.slugTouched) {
+          this.form.controls.slug.setValue(slugify(title), { emitEvent: false });
+        }
+      });
 
-    this.form.controls.slug.valueChanges.subscribe(() => {
-      this.slugTouched = true;
-    });
+    this.form.controls.slug.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.slugTouched = true;
+      });
 
     if (id && id !== 'new') {
       this.postId.set(id);
@@ -75,8 +82,6 @@ export class BlogFormComponent implements OnInit {
     } else {
       this.loading.set(false);
     }
-
-    inject(Title).setTitle(`${id && id !== 'new' ? 'Edit' : 'New'} Post | Wedding Planner Admin`);
   }
 
   submit(): void {

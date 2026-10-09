@@ -1,19 +1,77 @@
-@if (post()) {
-  <article class="post container">
-    <h1>{{ post()?.title }}</h1>
-    @if (post()?.publishedAt) {
-      <p class="post__date">{{ post()?.publishedAt | date: 'longDate' }}</p>
+@if (post(); as entry) {
+  <article class="post">
+    <header class="post__head">
+      <div class="container container--narrow">
+        <a class="post__back link-arrow post__back--reverse" routerLink="/blog">Journal</a>
+        <h1 class="post__title">{{ entry.title }}</h1>
+        <p class="post__meta">
+          @if (entry.publishedAt) {
+            <span>{{ entry.publishedAt | date: 'd MMMM yyyy' }}</span>
+          }
+          <span>{{ minutes() }} min read</span>
+        </p>
+      </div>
+    </header>
+
+    @if (entry.coverImage) {
+      <figure class="post__cover">
+        <!-- The cover is the LCP element on this page: never lazy-loaded. -->
+        <img [src]="entry.coverImage" [alt]="entry.title" fetchpriority="high" decoding="async" />
+      </figure>
     }
-    @if (post()?.coverImage) {
-      <img class="post__cover" [src]="post()?.coverImage" [alt]="post()?.title" />
+
+    <div class="container container--narrow">
+      @if (entry.excerpt) {
+        <p class="post__standfirst">{{ entry.excerpt }}</p>
+      }
+
+      <div class="prose post__body">{{ entry.content }}</div>
+
+      <!-- End-of-post CTA: this is where blog conversions actually happen. -->
+      <aside class="post__cta">
+        <h2 class="post__cta-title">Planning a wedding of your own?</h2>
+        <p>
+          If any of this sounds like the day you are imagining, we would love to hear about it.
+        </p>
+        <div class="post__cta-actions">
+          <a class="btn" routerLink="/booking">Book a consultation</a>
+          <a class="btn btn-outline" routerLink="/contact">Send a note</a>
+        </div>
+      </aside>
+    </div>
+
+    @if (related().length) {
+      <section class="section section--sand post__related">
+        <div class="container">
+          <h2 class="post__related-title">More from the journal</h2>
+          <div class="related">
+            @for (other of related(); track other.id) {
+              <article class="related__item">
+                @if (other.coverImage) {
+                  <a [routerLink]="['/blog', other.slug]" tabindex="-1" aria-hidden="true">
+                    <img [src]="other.coverImage" [alt]="other.title" loading="lazy" decoding="async" />
+                  </a>
+                }
+                @if (other.publishedAt) {
+                  <p class="related__date">{{ other.publishedAt | date: 'd MMMM yyyy' }}</p>
+                }
+                <h3 class="related__heading">
+                  <a [routerLink]="['/blog', other.slug]">{{ other.title }}</a>
+                </h3>
+              </article>
+            }
+          </div>
+        </div>
+      </section>
     }
-    <div class="post__content">{{ post()?.content }}</div>
-    <a class="btn btn-outline" routerLink="/blog">&larr; Back to Blog</a>
   </article>
 } @else if (notFound()) {
-  <div class="container not-found">
-    <h1>Post Not Found</h1>
-    <p>We couldn't find the blog post you're looking for.</p>
-    <a class="btn" routerLink="/blog">Back to Blog</a>
-  </div>
+  <section class="section">
+    <div class="container container--narrow missing">
+      <span class="eyebrow">404</span>
+      <h1>We couldn&rsquo;t find that entry</h1>
+      <p>It may have been renamed or taken down. The rest of the journal is still here.</p>
+      <a class="btn" routerLink="/blog">Back to the journal</a>
+    </div>
+  </section>
 }

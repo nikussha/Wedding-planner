@@ -38,7 +38,7 @@
   <div class="photo-grid">
     @for (photo of photos(); track photo.id; let i = $index) {
       <div class="card photo-card">
-        <img [src]="photo.url" [alt]="photo.alt ?? ''" />
+        <img [src]="photo.url" [alt]="photo.alt ?? ''" loading="lazy" (error)="onImageError($event)" />
 
         <label>Alt text</label>
         <input

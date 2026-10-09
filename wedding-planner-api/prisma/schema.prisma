@@ -67,15 +67,145 @@ model BlogPost {
   updatedAt   DateTime  @updatedAt
 }
 
+// A booking request for one bookable slot. slotStart/slotEnd are stored as UTC
+// instants; the slot grid itself is defined in the planner's local timezone by
+// AvailabilitySetting. Several PENDING appointments may share a slot (visitors
+// compete for it); confirming one CANCELs the rest, and only a CONFIRMED
+// appointment makes the slot unavailable to everyone else.
 model Appointment {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  eventDate DateTime
+  slotStart DateTime
+  slotEnd   DateTime
   message   String?
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([slotStart])
+  @@index([status, slotStart])
+}
+
+// Singleton row (id = "default") describing when the planner takes bookings.
+// The slot grid is generated from these values, so the admin can change opening
+// hours without a deploy. timezoneOffsetMinutes is a fixed offset (the planner
+// works in one timezone) - +240 is Asia/Tbilisi, which has no DST.
+model AvailabilitySetting {
+  id                    String   @id @default("default")
+  slotMinutes           Int      @default(120)
+  dayStartHour          Int      @default(10)
+  dayEndHour            Int      @default(18)
+  openWeekdays          String   @default("1,2,3,4,5,6")
+  leadTimeHours         Int      @default(24)
+  horizonDays           Int      @default(365)
+  timezoneOffsetMinutes Int      @default(240)
+  timezoneLabel         String   @default("GMT+4")
+  updatedAt             DateTime @updatedAt
+}
+
+// A single closed day (holiday, vacation, already-booked wedding). Stored as
+// the midnight UTC instant of the planner-local calendar date.
+model BlockedDate {
+  id        String   @id @default(cuid())
+  date      DateTime @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+// A note from the public contact form. Deliberately separate from Appointment:
+// most couples enquire long before they will commit to a consultation slot, so
+// this path has no account and no calendar.
+model Enquiry {
+  id          String    @id @default(cuid())
+  names       String
+  email       String
+  weddingDate DateTime?
+  location    String?
+  message     String
+  status      String    @default("NEW")
+  createdAt   DateTime  @default(now())
+  handledAt   DateTime?
+
+  @@index([status, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Editable marketing content.
+//
+// These four models exist because key/value SiteContent cannot express an
+// ordered list. Each row carries `order` (ascending) and `published`, so the
+// owner can reorder items and retire one without deleting it. The public site
+// renders only published rows and hides a section whose list is empty.
+// ---------------------------------------------------------------------------
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  /**
+   * First names are the convention, and kinder to the couple.
+   */
+  names     String
+  /**
+   * Venue and season: what makes a quote credible.
+   */
+  context   String?
+  quote     String
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model ProcessStep {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model ServiceTier {
+  id             String   @id @default(cuid())
+  /**
+   * Used for the page anchor, e.g. /services#full-planning.
+   */
+  slug           String   @unique
+  name           String
+  forWho         String
+  startsAt       String
+  /**
+   * Empty means "shared with your proposal" rather than an invented price.
+   */
+  investment     String?
+  /**
+   * One item per line; the API splits these into arrays for the site.
+   */
+  includedBefore String
+  includedOnDay  String
+  excluded       String
+  order          Int      @default(0)
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([published, order])
 }

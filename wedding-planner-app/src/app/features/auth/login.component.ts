@@ -3,8 +3,10 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { extractErrorMessage } from '../../core/utils/http-error.util';
+import { safeInternalRedirect } from '../../core/utils/safe-redirect.util';
 
 @Component({
   selector: 'app-login',
@@ -40,15 +42,17 @@ export class LoginComponent {
     this.errorMessage.set(null);
 
     const { email, password } = this.form.getRawValue();
-    this.authService.login(email, password).subscribe({
-      next: () => {
-        const redirect = this.route.snapshot.queryParamMap.get('redirect') ?? '/';
-        this.router.navigateByUrl(redirect);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.submitting.set(false);
-        this.errorMessage.set(extractErrorMessage(err, 'Invalid email or password.'));
-      },
-    });
+    this.authService
+      .login(email, password)
+      .pipe(finalize(() => this.submitting.set(false)))
+      .subscribe({
+        next: () => {
+          const redirect = safeInternalRedirect(this.route.snapshot.queryParamMap.get('redirect'));
+          this.router.navigateByUrl(redirect);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.errorMessage.set(extractErrorMessage(err, 'Invalid email or password.'));
+        },
+      });
   }
 }

@@ -1,61 +1,255 @@
-.site-header {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+/**
+ * The stickiness belongs on the host, not on the <header> inside it.
+ * A sticky element can only travel within its own containing block, and
+ * <app-header>'s box is exactly as tall as the header - so a sticky child of
+ * it has nowhere to stick and simply scrolls away. The host is a flex item of
+ * app-root, whose box spans the whole page, which is what makes this work.
+ */
+:host {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
+  display: block;
 }
 
-.site-header__inner {
+/**
+ * Out of the way while the page is moving. Only `transform` is animated, so
+ * the slide runs on the compositor and costs nothing during the scroll it is
+ * reacting to - animating `top` or `height` here would be the expensive way
+ * to do the same thing.
+ */
+:host(.is-hidden) {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :host {
+    transition: transform var(--dur-ui) var(--ease-standard);
+  }
+}
+
+.masthead {
+  background: var(--canvas);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-ui) var(--ease-standard),
+    background-color var(--dur-ui) var(--ease-standard);
+}
+
+/* The header only draws a line once the page has moved under it. Opaque on
+   purpose: a translucent sticky bar with a backdrop-filter has to blur
+   whatever is behind it on every scroll frame, which is one of the easiest
+   ways to make a page feel heavy. */
+.masthead.is-scrolled {
+  border-bottom-color: var(--line);
+  background: var(--canvas);
+}
+
+.masthead__inner {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  min-height: 72px;
-  flex-wrap: wrap;
+  gap: var(--space-lg);
+  min-height: var(--header-h);
 }
 
-.site-header__brand {
-  font-family: var(--font-heading);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-text);
+.brand {
+  display: flex;
+  flex-direction: column;
+  margin-right: auto;
+  color: var(--ink-900);
 
   &:hover {
     text-decoration: none;
-    color: var(--color-primary);
+    color: var(--rose-700);
   }
 }
 
-.site-header__nav {
-  display: flex;
-  gap: 1.5rem;
-  flex: 1;
-
-  a {
-    color: var(--color-text);
-    font-weight: 500;
-    padding: 0.25rem 0;
-    border-bottom: 2px solid transparent;
-
-    &:hover {
-      text-decoration: none;
-      color: var(--color-primary);
-    }
-
-    &.is-active {
-      color: var(--color-primary);
-      border-bottom-color: var(--color-primary);
-    }
-  }
+.brand__name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
 }
 
-.site-header__actions {
+.brand__region {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.masthead__menu {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-lg);
 }
 
-.site-header__user {
-  font-weight: 600;
-  color: var(--color-text-muted);
+.nav {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.nav__link {
+  position: relative;
+  padding: 0.3rem 0;
+  color: var(--ink-900);
+  font-size: 0.92rem;
+  font-weight: 500;
+
+  /* Underline grows from the centre rather than appearing all at once. */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    bottom: 0;
+    height: 1px;
+    background: var(--rose-700);
+    transition: left var(--dur-ui) var(--ease-standard), right var(--dur-ui) var(--ease-standard);
+  }
+
+  &:hover {
+    text-decoration: none;
+    color: var(--rose-700);
+
+    &::after {
+      left: 0;
+      right: 0;
+    }
+  }
+
+  &.is-active {
+    color: var(--rose-700);
+
+    &::after {
+      left: 0;
+      right: 0;
+    }
+  }
+}
+
+.masthead__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.masthead__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.masthead__who {
+  font-size: 0.82rem;
+  color: var(--ink-600);
+}
+
+.masthead__quiet {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--ink-600);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--rose-700);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+}
+
+.masthead__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.masthead__bar {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  margin: 0 auto;
+  background: var(--ink-900);
+  transition: transform var(--dur-ui) var(--ease-standard), opacity var(--dur-ui) var(--ease-standard);
+}
+
+.masthead.is-open .masthead__bar:first-child {
+  transform: translateY(3.75px) rotate(45deg);
+}
+
+.masthead.is-open .masthead__bar:last-child {
+  transform: translateY(-3.75px) rotate(-45deg);
+}
+
+@media (max-width: 880px) {
+  .masthead__inner {
+    gap: var(--space-sm);
+    min-height: var(--header-h);
+  }
+
+  .masthead__toggle {
+    display: flex;
+  }
+
+  /* A full-height sheet rather than a dropdown: at this width the menu is the
+     page while it is open. */
+  .masthead__menu {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: var(--space-xl);
+    padding: var(--space-xl) var(--gutter) calc(var(--space-xl) + env(safe-area-inset-bottom));
+    background: var(--canvas);
+    overflow-y: auto;
+  }
+
+  .masthead.is-open .masthead__menu {
+    display: flex;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .nav__link {
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 400;
+
+    /* The growing underline is a pointer affordance; drop it in the sheet. */
+    &::after {
+      display: none;
+    }
+  }
+
+  .masthead__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .masthead__account {
+    justify-content: space-between;
+  }
 }

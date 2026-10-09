@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { extractErrorMessage } from '../../core/utils/http-error.util';
 
@@ -39,21 +40,22 @@ export class LoginComponent {
     this.errorMessage.set(null);
 
     const { email, password } = this.form.getRawValue();
-    this.authService.login(email, password).subscribe({
-      next: () => {
-        if (this.authService.isAdmin()) {
-          this.router.navigateByUrl('/dashboard');
-          return;
-        }
+    this.authService
+      .login(email, password)
+      .pipe(finalize(() => this.submitting.set(false)))
+      .subscribe({
+        next: () => {
+          if (this.authService.isAdmin()) {
+            this.router.navigateByUrl('/dashboard');
+            return;
+          }
 
-        this.submitting.set(false);
-        this.errorMessage.set('This account does not have admin access.');
-        this.authService.logout().subscribe();
-      },
-      error: (err: HttpErrorResponse) => {
-        this.submitting.set(false);
-        this.errorMessage.set(extractErrorMessage(err, 'Invalid email or password.'));
-      },
-    });
+          this.errorMessage.set('This account does not have admin access.');
+          this.authService.logout().subscribe();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.errorMessage.set(extractErrorMessage(err, 'Invalid email or password.'));
+        },
+      });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { unlink } from 'node:fs/promises';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
@@ -34,7 +34,8 @@ export class PhotosService {
     const photo = await this.findOneOrThrow(id);
 
     if (photo.url.startsWith('/uploads/')) {
-      const filePath = join(process.cwd(), photo.url);
+      // Strip any path segments so the delete can never escape the uploads dir.
+      const filePath = join(process.cwd(), 'uploads', basename(photo.url));
       await unlink(filePath).catch(() => undefined);
     }
 

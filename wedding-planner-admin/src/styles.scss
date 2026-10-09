@@ -236,3 +236,30 @@ table {
   flex-wrap: wrap;
   gap: 1rem;
 }
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1.1rem;
+  }
+
+  /* Wide data tables scroll horizontally instead of being crushed */
+  .card:has(> table) {
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .card > table {
+    min-width: 560px;
+
+    th,
+    td {
+      white-space: nowrap;
+    }
+
+    .message-cell {
+      white-space: normal;
+      min-width: 200px;
+    }
+  }
+}
