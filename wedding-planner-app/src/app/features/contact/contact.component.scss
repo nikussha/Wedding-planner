@@ -1,0 +1,95 @@
+.contact {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: var(--space-3xl);
+  align-items: start;
+}
+
+/* ---- the consultation panel ----------------------------------------- */
+
+.consult {
+  padding: var(--space-lg);
+  background: var(--sand-100);
+  border: 1px solid var(--line);
+}
+
+.consult__title {
+  margin-bottom: var(--space-xs);
+}
+
+.consult__body {
+  color: var(--ink-700);
+}
+
+.consult__cta {
+  width: 100%;
+}
+
+.consult__direct {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line-strong);
+}
+
+.consult__direct-title {
+  margin-bottom: var(--space-2xs);
+  font-family: var(--font-body);
+  font-size: var(--fs-overline);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.consult__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-small);
+}
+
+/* ---- the note form --------------------------------------------------- */
+
+.enquiry__title {
+  margin-bottom: var(--space-2xs);
+}
+
+.enquiry__intro {
+  max-width: var(--measure-narrow);
+  color: var(--ink-700);
+  margin-bottom: var(--space-lg);
+}
+
+.enquiry__done {
+  max-width: var(--measure-narrow);
+  padding: var(--space-lg);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+
+.enquiry__done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 920px) {
+  .contact {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+  }
+
+  /* The form leads on mobile; the panel below it still carries the calendar
+     link, which is where the sticky header CTA also points. */
+  .consult {
+    order: 2;
+  }
+
+  .enquiry {
+    order: 1;
+  }
+}

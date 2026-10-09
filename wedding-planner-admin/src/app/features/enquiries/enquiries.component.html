@@ -1,0 +1,114 @@
+<div class="page-header">
+  <h1>Enquiries</h1>
+  <div class="filters">
+    <button
+      type="button"
+      class="btn btn-sm"
+      [class.btn-outline]="filter() !== 'OPEN'"
+      (click)="setFilter('OPEN')"
+    >
+      Open
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm"
+      [class.btn-outline]="filter() !== 'ALL'"
+      (click)="setFilter('ALL')"
+    >
+      All
+    </button>
+  </div>
+</div>
+
+@if (loading()) {
+  <p>Loading&hellip;</p>
+} @else if (enquiries().length === 0) {
+  <div class="card">
+    <p class="empty">
+      No enquiries yet. Messages sent from the contact page on the public site land here.
+    </p>
+  </div>
+} @else {
+  @if (newCount() > 0) {
+    <p class="summary">
+      {{ newCount() }} new {{ newCount() === 1 ? 'enquiry' : 'enquiries' }} to answer.
+    </p>
+  }
+
+  @if (visible().length === 0) {
+    <div class="card"><p class="empty">Nothing open. Switch to "All" to see archived enquiries.</p></div>
+  }
+
+  @for (enquiry of visible(); track enquiry.id) {
+    <article class="card enquiry">
+      <header class="enquiry__head">
+        <div>
+          <h2 class="enquiry__names">{{ enquiry.names }}</h2>
+          <p class="enquiry__meta">
+            <a [href]="'mailto:' + enquiry.email">{{ enquiry.email }}</a>
+            &middot; sent {{ enquiry.createdAt | date: 'd MMM yyyy, HH:mm' }}
+          </p>
+        </div>
+        <span class="badge" [class]="badgeClass(enquiry.status)">
+          {{ statusLabel(enquiry.status) }}
+        </span>
+      </header>
+
+      <dl class="enquiry__facts">
+        <div>
+          <dt>Wedding date</dt>
+          <dd>
+            {{ enquiry.weddingDate ? (enquiry.weddingDate | date: 'd MMM yyyy') : 'Not set yet' }}
+          </dd>
+        </div>
+        <div>
+          <dt>Venue / location</dt>
+          <dd>{{ enquiry.location || 'Not given' }}</dd>
+        </div>
+      </dl>
+
+      <p class="enquiry__message">{{ enquiry.message }}</p>
+
+      <footer class="enquiry__actions">
+        <a class="btn btn-sm" [href]="mailtoHref(enquiry)">Reply by email</a>
+        @if (enquiry.status !== 'REPLIED') {
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            [disabled]="busyId() === enquiry.id"
+            (click)="setStatus(enquiry, 'REPLIED')"
+          >
+            Mark replied
+          </button>
+        }
+        @if (enquiry.status !== 'ARCHIVED') {
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm"
+            [disabled]="busyId() === enquiry.id"
+            (click)="setStatus(enquiry, 'ARCHIVED')"
+          >
+            Archive
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm"
+            [disabled]="busyId() === enquiry.id"
+            (click)="setStatus(enquiry, 'NEW')"
+          >
+            Reopen
+          </button>
+        }
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm enquiry__delete"
+          [disabled]="busyId() === enquiry.id"
+          (click)="remove(enquiry)"
+        >
+          Delete
+        </button>
+      </footer>
+    </article>
+  }
+}
