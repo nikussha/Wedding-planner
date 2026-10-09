@@ -1,57 +1,162 @@
 <div class="page-header">
   <h1>Bookings</h1>
+  <a class="btn btn-outline btn-sm" routerLink="/availability">Opening hours</a>
 </div>
 
 @if (loading()) {
-  <p>Loading…</p>
+  <p>Loading&hellip;</p>
 } @else if (bookings().length === 0) {
   <p>No booking requests yet.</p>
 } @else {
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Requester</th>
-          <th>Event Date</th>
-          <th>Message</th>
-          <th>Status</th>
-          <th>Requested</th>
-          <th>Update</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (booking of bookings(); track booking.id) {
-          <tr>
-            <td>
-              @if (booking.user) {
-                <div class="requester">
-                  <span class="requester-name">{{ booking.user.name }}</span>
-                  <span class="requester-email">{{ booking.user.email }}</span>
+  <section class="section">
+    <h2 class="section__title">
+      Awaiting your confirmation
+      <span class="section__count">{{ pendingGroups().length }}</span>
+    </h2>
+
+    @if (pendingGroups().length === 0) {
+      <p class="section__empty">Nothing waiting. Every request has been answered.</p>
+    } @else {
+      @for (group of pendingGroups(); track group.slotStart) {
+        <div class="card slot">
+          <header class="slot__head">
+            <div>
+              <p class="slot__date">{{ group.dateLabel }}</p>
+              <p class="slot__time">{{ group.timeLabel }} &middot; {{ timezoneLabel() }}</p>
+            </div>
+            @if (group.requests.length > 1) {
+              <p class="slot__rivals">
+                {{ group.requests.length }} people want this time &mdash; confirming one declines
+                the others.
+              </p>
+            }
+          </header>
+
+          <ul class="requests">
+            @for (request of group.requests; track request.id) {
+              <li class="request">
+                <div class="request__who">
+                  <span class="requester-name">{{ request.user?.name || 'Unknown' }}</span>
+                  <span class="requester-email">{{ request.user?.email }}</span>
+                  <span class="request__meta">
+                    requested {{ request.createdAt | date: 'd MMM, HH:mm' }}
+                  </span>
                 </div>
-              } @else {
-                —
-              }
-            </td>
-            <td>{{ booking.eventDate | date: 'mediumDate' }}</td>
-            <td class="message-cell">{{ booking.message || '—' }}</td>
-            <td>
-              <span class="badge" [class]="badgeClass(booking.status)">{{ booking.status }}</span>
-            </td>
-            <td>{{ booking.createdAt | date: 'short' }}</td>
-            <td>
-              <select
-                [value]="booking.status"
-                (change)="updateStatus(booking, $any($event.target).value)"
-                [disabled]="updatingId() === booking.id"
-              >
-                @for (option of statusOptions; track option) {
-                  <option [value]="option">{{ option }}</option>
+
+                @if (request.message) {
+                  <p class="request__message">{{ request.message }}</p>
                 }
-              </select>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+
+                <div class="request__actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [disabled]="updatingId() === request.id"
+                    (click)="confirm(request)"
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    [disabled]="updatingId() === request.id"
+                    (click)="decline(request)"
+                  >
+                    Decline
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    }
+  </section>
+
+  <section class="section">
+    <h2 class="section__title">
+      Upcoming appointments
+      <span class="section__count">{{ upcomingConfirmed().length }}</span>
+    </h2>
+
+    @if (upcomingConfirmed().length === 0) {
+      <p class="section__empty">No confirmed appointments ahead.</p>
+    } @else {
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Who</th>
+              <th>Notes</th>
+              <th><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of upcomingConfirmed(); track booking.id) {
+              <tr>
+                <td>{{ booking.dateLabel }}</td>
+                <td class="nowrap">{{ booking.timeLabel }}</td>
+                <td>
+                  <div class="requester">
+                    <span class="requester-name">{{ booking.user?.name || 'Unknown' }}</span>
+                    <span class="requester-email">{{ booking.user?.email }}</span>
+                  </div>
+                </td>
+                <td class="message-cell">{{ booking.message || '—' }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    [disabled]="updatingId() === booking.id"
+                    (click)="decline(booking)"
+                  >
+                    Cancel
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  @if (archive().length) {
+    <details class="section archive">
+      <summary class="archive__summary">Past and declined ({{ archive().length }})</summary>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Who</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of archive(); track booking.id) {
+              <tr>
+                <td>{{ booking.dateLabel }}</td>
+                <td class="nowrap">{{ booking.timeLabel }}</td>
+                <td>
+                  <div class="requester">
+                    <span class="requester-name">{{ booking.user?.name || 'Unknown' }}</span>
+                    <span class="requester-email">{{ booking.user?.email }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" [class]="badgeClass(booking.status)">
+                    {{ statusLabel(booking.status) }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </details>
+  }
 }

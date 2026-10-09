@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Booking, BookingStatus } from '../models/booking.model';
+import { Booking, BookingStatus, BookingStatusChange } from '../models/booking.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookingsService {
@@ -11,7 +11,7 @@ export class BookingsService {
     return this.http.get<Booking[]>('/api/bookings');
   }
 
-  updateStatus(id: string, status: BookingStatus): Observable<Booking> {
-    return this.http.patch<Booking>(`/api/bookings/${id}`, { status });
+  updateStatus(id: string, status: BookingStatus): Observable<BookingStatusChange> {
+    return this.http.patch<BookingStatusChange>(`/api/bookings/${id}`, { status });
   }
 }

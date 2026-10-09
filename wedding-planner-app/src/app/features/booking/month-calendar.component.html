@@ -1,0 +1,95 @@
+<div class="cal">
+  <div class="cal__head">
+    <button
+      type="button"
+      class="cal__nav"
+      (click)="stepMonth(-1)"
+      [disabled]="!canGoBack()"
+      aria-label="Previous month"
+    >
+      <span aria-hidden="true">&#8249;</span>
+    </button>
+
+    <h3 class="cal__month" id="cal-month" aria-live="polite">{{ monthLabel() }}</h3>
+
+    <button
+      type="button"
+      class="cal__nav"
+      (click)="stepMonth(1)"
+      [disabled]="!canGoForward()"
+      aria-label="Next month"
+    >
+      <span aria-hidden="true">&#8250;</span>
+    </button>
+  </div>
+
+  <table
+    class="cal__grid"
+    role="grid"
+    aria-labelledby="cal-month"
+    [attr.aria-busy]="loading() ? true : null"
+    (keydown)="onKeydown($event)"
+  >
+    <thead>
+      <tr>
+        @for (weekday of weekdays; track weekday.short) {
+          <th scope="col">
+            <span aria-hidden="true">{{ weekday.short }}</span>
+            <span class="visually-hidden">{{ weekday.full }}</span>
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (week of weeks(); track week[0].day.date) {
+        <tr>
+          @for (cell of week; track cell.day.date) {
+            <td
+              class="cal__cell"
+              [class.cal__cell--outside]="cell.outside"
+              [class.cal__cell--closed]="!cell.outside && !cell.day.open"
+              [class.cal__cell--open]="cell.selectable"
+              [class.cal__cell--full]="cell.fullyBooked"
+              [class.cal__cell--spent]="cell.noTimesLeft"
+              [class.cal__cell--selected]="cell.day.date === selected()"
+              [class.cal__cell--today]="cell.isToday"
+              [attr.data-date]="cell.day.date"
+              [attr.tabindex]="cell.day.date === tabStop() ? 0 : -1"
+              [attr.aria-selected]="cell.day.date === selected() ? true : null"
+              [attr.aria-disabled]="cell.selectable ? null : true"
+              [attr.aria-current]="cell.isToday ? 'date' : null"
+              (click)="select(cell)"
+            >
+              <span class="cal__num" aria-hidden="true">{{ cell.number }}</span>
+
+              @if (!cell.outside) {
+                @if (cell.fullyBooked) {
+                  <span class="cal__tag" aria-hidden="true">Full</span>
+                } @else if (cell.day.open) {
+                  <span class="cal__marks" aria-hidden="true">
+                    @for (free of cell.marks; track $index) {
+                      <span class="cal__mark" [class.cal__mark--free]="free"></span>
+                    }
+                  </span>
+                } @else if (cell.isToday) {
+                  <span class="cal__tag" aria-hidden="true">Today</span>
+                }
+              }
+
+              <span class="visually-hidden">{{ cell.label }}</span>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <ul class="cal__key">
+    <li class="cal__key-item">
+      <span class="cal__mark cal__mark--free" aria-hidden="true"></span> Times free
+    </li>
+    <li class="cal__key-item"><span class="cal__mark" aria-hidden="true"></span> Taken</li>
+    <li class="cal__key-item cal__key-item--full">Full &mdash; fully booked</li>
+  </ul>
+</div>

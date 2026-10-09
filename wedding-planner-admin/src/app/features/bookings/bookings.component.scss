@@ -1,3 +1,103 @@
+.section {
+  margin-bottom: 2.25rem;
+}
+
+.section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.85rem;
+  font-size: 1.1rem;
+}
+
+.section__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.section__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.slot {
+  padding: 1.1rem 1.25rem;
+
+  & + .slot {
+    margin-top: 0.85rem;
+  }
+}
+
+.slot__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.slot__date {
+  margin: 0;
+  font-weight: 600;
+}
+
+.slot__time {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one thing an admin must understand before clicking Confirm. */
+.slot__rivals {
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  background: #fff3cd;
+  color: #8a6d00;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.requests {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.request {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'who actions'
+    'message actions';
+  gap: 0.35rem 1rem;
+  padding: 0.85rem 0;
+
+  & + .request {
+    border-top: 1px dashed var(--color-border);
+  }
+}
+
+.request__who {
+  grid-area: who;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
 .requester {
   display: flex;
   flex-direction: column;
@@ -13,12 +113,66 @@
   color: var(--color-text-muted);
 }
 
+.request__meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.request__message {
+  grid-area: message;
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-left: 2px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.86rem;
+  white-space: pre-wrap;
+}
+
+.request__actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .message-cell {
   max-width: 280px;
   white-space: pre-wrap;
 }
 
-select {
-  padding: 0.4rem 0.6rem;
-  font-size: 0.85rem;
+.nowrap {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.archive__summary {
+  margin-bottom: 0.85rem;
+  font-size: 1.1rem;
+  font-family: var(--font-heading);
+  cursor: pointer;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .request {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'who'
+      'message'
+      'actions';
+  }
+
+  .request__actions {
+    padding-top: 0.25rem;
+  }
 }

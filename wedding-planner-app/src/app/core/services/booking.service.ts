@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { Booking } from '../models/booking.model';
 
 export interface CreateBookingPayload {
-  eventDate: string;
+  /** Slot start as a UTC instant, exactly as the calendar returned it. */
+  slotStart: string;
   message?: string;
 }
 
